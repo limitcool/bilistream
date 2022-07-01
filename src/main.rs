@@ -1,49 +1,16 @@
 mod twitch;
-use serde::{Deserialize, Serialize};
+mod live;
+mod config;
+mod youtube;
 // use tracing::info;
-use std::{time::{Duration,}, error::Error,};
+use std::{time::{Duration,}};
 use tokio;
-use reqwest::{cookie::Jar, Url};
 use std::path::Path;
-use reqwest_retry::policies::ExponentialBackoff;
-use reqwest_retry::RetryTransientMiddleware;
-use reqwest_middleware::{ClientBuilder};
+use reqwest::{cookie::Jar, Url};
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
 use std::process::Command;
-use twitch::{Live, Twitch};
 use tracing::info;
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Config {
-    #[serde(rename = "BiliLive")]
-    bililive: BiliLive,
-    #[serde(rename = "Twitch")]
-    twitch:TwitchC,
-    #[serde(rename = "Interval")]
-    interval:u64,
-}
-
-#[derive(Debug, Serialize, Deserialize,Clone)]
-struct BiliLive{
-    #[serde(rename = "SESSDATA")]
-    sessdata: String,
-    bili_jct: String,
-    #[serde(rename = "DedeUserID")]
-    dede_user_id: String,
-    #[serde(rename= "DedeUserID__ckMd5")]
-    dede_user_id_ckmd5: String,
-    #[serde(rename= "Room")]
-    room:i32,
-    #[serde(rename= "BiliRtmpUrl")]
-    bili_rtmp_url: String,
-    #[serde(rename= "BiliRtmpKey")]
-    bili_rtmp_key: String,
-}
-#[derive(Debug, Serialize, Deserialize)]
-struct TwitchC{
-    #[serde(rename= "Room")]
-    room:String,
-}
+use config::{load_config,Config};
 
 // }
 #[tokio::main]
@@ -53,36 +20,23 @@ async fn main() {
     .with(fmt::layer())
     .init();
     let cfg = load_config(Path::new("./config.yaml")).unwrap();
-    // 设置最大重试次数为3次
-    let retry_policy = ExponentialBackoff::builder().build_with_max_retries(3);
-    let raw_client = reqwest::Client::builder()
-    .cookie_store(true)
-    // 设置超时时间为300秒
-    .timeout(Duration::new(10, 0))
-    .build().unwrap();
-    let client = ClientBuilder::new(raw_client.clone())
-    .with(RetryTransientMiddleware::new_with_policy(retry_policy))
-    .build();
-
-    let  t = Twitch{
-        room : cfg.twitch.room.clone(),
-        client: client.clone()
-    };
-
+    let r = live::select_live(cfg.clone()).unwrap();
+    
+    println!("{}",r.get_real_m3u8_url().await.unwrap());
     loop {
-        if t.get_status().await.unwrap() {
-            info!("Twitch直播中");
+        if r.get_status().await.unwrap() {
+            info!("{}", format!("{}直播中",r.room()));
             if get_bili_live_state().await {
                 info!("B站直播中");
-                ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), t.get_token().await.unwrap());
+                ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap());
             }else{
                 info!("B站未直播");
                 bili_start_live(&cfg).await;
                 info!("B站已开播");
-                ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), t.get_token().await.unwrap());
+                ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap());
             }
         } else {
-            info!("Twitch未直播");
+            info!("{}", format!("{}未直播",r.room()));
             if get_bili_live_state().await {
                 info!("B站直播中");
                 bili_stop_live(&cfg).await;
@@ -147,13 +101,6 @@ async fn bili_stop_live(cfg:&Config){
 }
 
 
-// 读取配置文件
-pub fn load_config(config: &Path) -> Result<Config,Box<dyn Error>>{
-    let file = std::fs::File::open(config)?;
-    let config: Config = serde_yaml::from_reader(file)?;
-    // println!("body = {:?}", client);
-    Ok(config)
-}
 
 pub fn ffmpeg(rtmp_url:String,rtmp_key:String,m3u8_url:String){
     let cmd = format!("{}&key={}",rtmp_url,rtmp_key);

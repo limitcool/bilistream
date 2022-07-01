@@ -1,0 +1,55 @@
+use serde::{Deserialize, Serialize};
+use std::error::Error;
+use std::path::Path;
+
+#[derive(Debug, Serialize, Deserialize,Clone)]
+pub struct Config {
+    #[serde(rename = "BiliLive")]
+    pub bililive: BiliLive,
+    #[serde(rename = "Twitch")]
+    pub twitch: TwitchC,
+    #[serde(rename = "Interval")]
+    pub interval: u64,
+    #[serde(rename = "Youtube")]
+    pub youtube: YoutubeC,
+    #[serde(rename = "Platform")]
+    pub platform: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct BiliLive {
+    #[serde(rename = "SESSDATA")]
+    pub sessdata: String,
+    pub bili_jct: String,
+    #[serde(rename = "DedeUserID")]
+    pub dede_user_id: String,
+    #[serde(rename = "DedeUserID__ckMd5")]
+    pub dede_user_id_ckmd5: String,
+    #[serde(rename = "Room")]
+    pub room: i32,
+    #[serde(rename = "BiliRtmpUrl")]
+    pub bili_rtmp_url: String,
+    #[serde(rename = "BiliRtmpKey")]
+    pub bili_rtmp_key: String,
+}
+#[derive(Debug, Serialize, Deserialize,Clone)]
+pub struct TwitchC {
+    #[serde(rename = "Room")]
+    pub room: String,
+}
+
+#[derive(Debug, Serialize, Deserialize,Clone)]
+pub struct YoutubeC {
+    #[serde(rename = "Room")]
+    pub room: String,
+    #[serde(rename = "AccessToken")]
+    pub access_token: String,
+}
+
+// 读取配置文件
+pub fn load_config(config: &Path) -> Result<Config, Box<dyn Error>> {
+    let file = std::fs::File::open(config)?;
+    let config: Config = serde_yaml::from_reader(file)?;
+    // println!("body = {:?}", client);
+    Ok(config)
+}
