@@ -21,12 +21,11 @@ async fn main() {
     .init();
     let cfg = load_config(Path::new("./config.yaml")).unwrap();
     let r = live::select_live(cfg.clone()).unwrap();
-    
-    println!("{}",r.get_real_m3u8_url().await.unwrap());
+    // 设置tracing日志等级为Info
     loop {
         if r.get_status().await.unwrap() {
             info!("{}", format!("{}直播中",r.room()));
-            if get_bili_live_state().await {
+            if get_bili_live_state(cfg.bililive.room.clone()).await {
                 info!("B站直播中");
                 ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap());
             }else{
@@ -37,7 +36,7 @@ async fn main() {
             }
         } else {
             info!("{}", format!("{}未直播",r.room()));
-            if get_bili_live_state().await {
+            if get_bili_live_state(cfg.bililive.room.clone()).await {
                 info!("B站直播中");
                 bili_stop_live(&cfg).await;
                 info!("B站已关播");
@@ -51,10 +50,10 @@ async fn main() {
 
 
 // 获取B站直播状态
-async fn get_bili_live_state() -> bool {
+async fn get_bili_live_state(room:i32) -> bool {
     let client = reqwest::Client::new();
     let res:serde_json::Value = client
-    .get("https://api.live.bilibili.com/xlive/web-room/v2/index/getRoomPlayInfo?room_id=660428&platform=web")
+    .get(format!("https://api.live.bilibili.com/xlive/web-room/v2/index/getRoomPlayInfo?room_id={}&platform=web",room))
     
     .send()
     .await
