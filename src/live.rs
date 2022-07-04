@@ -16,12 +16,12 @@ pub trait Live {
 
 
 pub fn select_live(cfg:Config) -> Result<Box<dyn Live>,Box<dyn Error>> {
-    // 设置最大重试次数为3次
-    let retry_policy = ExponentialBackoff::builder().build_with_max_retries(3);
+    // 设置最大重试次数为4294967295次
+    let retry_policy = ExponentialBackoff::builder().build_with_max_retries(4294967295);
     let raw_client = reqwest::Client::builder()
     .cookie_store(true)
-    // 设置超时时间为300秒
-    .timeout(Duration::new(10, 0))
+    // 设置超时时间为30秒
+    .timeout(Duration::new(30, 0))
     .build().unwrap();
     let client = ClientBuilder::new(raw_client.clone())
     .with(RetryTransientMiddleware::new_with_policy(retry_policy))

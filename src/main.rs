@@ -7,39 +7,51 @@ use std::{time::{Duration,}};
 use tokio;
 use std::path::Path;
 use reqwest::{cookie::Jar, Url};
-use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
+use tracing_subscriber::{filter::EnvFilter,fmt, layer::SubscriberExt, util::SubscriberInitExt};
 use std::process::Command;
-use tracing::info;
 use config::{load_config,Config};
 
 // }
 #[tokio::main]
 async fn main() {
+
+    let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
     // 只有注册 subscriber 后， 才能在控制台上看到日志输出
     tracing_subscriber::registry()
+    .with(env_filter)
     .with(fmt::layer())
     .init();
     let cfg = load_config(Path::new("./config.yaml")).unwrap();
     let r = live::select_live(cfg.clone()).unwrap();
     // 设置tracing日志等级为Info
     loop {
-        if r.get_status().await.unwrap() {
-            info!("{}", format!("{}直播中",r.room()));
+        if r.get_status().await.unwrap_or(false) {
+            tracing::info!("{}", format!("{}直播中",r.room()));
             if get_bili_live_state(cfg.bililive.room.clone()).await {
-                info!("B站直播中");
+                tracing::info!("B站直播中");
                 ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap());
             }else{
-                info!("B站未直播");
+                tracing::info!("B站未直播");
                 bili_start_live(&cfg).await;
-                info!("B站已开播");
+                tracing::info!("B站已开播");
                 ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap());
+                loop {
+                    if r.get_status() {
+                        ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap());
+                        bili_stop_live(&cfg).await;
+                        tracing::info!("B站已关播");
+                    }else{
+                        break;
+                    }
+                    tokio::time::sleep(Duration::from_secs(5)).await;
+                }
             }
         } else {
-            info!("{}", format!("{}未直播",r.room()));
+            tracing::info!("{}", format!("{}未直播",r.room()));
             if get_bili_live_state(cfg.bililive.room.clone()).await {
-                info!("B站直播中");
+                tracing::info!("B站直播中");
                 bili_stop_live(&cfg).await;
-                info!("B站已关播");
+                tracing::info!("B站已关播");
             }
         }
         // 每60秒检测一下直播状态
@@ -50,8 +62,17 @@ async fn main() {
 
 
 // 获取B站直播状态
-async fn get_bili_live_state(room:i32) -> bool {
-    let client = reqwest::Client::new();
+async fn get_bili_live_state(room:i32, ) -> bool {
+    // 设置最大重试次数为4294967295次
+    let retry_policy = ExponentialBackoff::builder().build_with_max_retries(4294967295);
+    let raw_client = reqwest::Client::builder()
+    .cookie_store(true)
+    // 设置超时时间为30秒
+    .timeout(Duration::new(30, 0))
+    .build().unwrap();
+    let client = ClientBuilder::new(raw_client.clone())
+    .with(RetryTransientMiddleware::new_with_policy(retry_policy))
+    .build();
     let res:serde_json::Value = client
     .get(format!("https://api.live.bilibili.com/xlive/web-room/v2/index/getRoomPlayInfo?room_id={}&platform=web",room))
     
@@ -61,7 +82,7 @@ async fn get_bili_live_state(room:i32) -> bool {
     .json()
     .await
     .unwrap();
-    println!("{:#?}",res["data"]["live_status"]);
+    // println!("{:#?}",res["data"]["live_status"]);
     if res["data"]["live_status"] == 0{
         return false;
     }else{
@@ -77,12 +98,22 @@ async fn bili_start_live(cfg:&Config){
     let url= "https://api.live.bilibili.com/".parse::<Url>().unwrap();
     let jar = Jar::default();
     jar.add_cookie_str(cookie.as_str(), &url);
-    let client = reqwest::Client::builder().cookie_provider(jar.into()).build().unwrap();
-    let res:serde_json::Value = client.post("https://api.live.bilibili.com/room/v1/Room/startLive")
+    // 设置最大重试次数为4294967295次
+    let retry_policy = ExponentialBackoff::builder().build_with_max_retries(4294967295);
+    let raw_client = reqwest::Client::builder()
+    .cookie_store(true)
+    .cookie_provider(jar.into())
+    // 设置超时时间为30秒
+    .timeout(Duration::new(30, 0))
+    .build().unwrap();
+    let client = ClientBuilder::new(raw_client.clone())
+    .with(RetryTransientMiddleware::new_with_policy(retry_policy))
+    .build();
+    let _res:serde_json::Value = client.post("https://api.live.bilibili.com/room/v1/Room/startLive")
     .header("Accept", "application/json, text/plain, */*")
     .header("content-type", "application/x-www-form-urlencoded; charset=UTF-8")
     .body(format!("room_id={}&platform=pc&area_v2=433&csrf_token={}&csrf={}",cfg.bililive.room,cfg.bililive.bili_jct,cfg.bililive.bili_jct)).send().await.unwrap().json().await.unwrap();
-    println!("{:#?}",res);
+    // println!("{:#?}",res);
 }
 
 // bilibili关播
@@ -91,12 +122,22 @@ async fn bili_stop_live(cfg:&Config){
     let url= "https://api.live.bilibili.com/".parse::<Url>().unwrap();
     let jar = Jar::default();
     jar.add_cookie_str(cookie.as_str(), &url);
-    let client = reqwest::Client::builder().cookie_provider(jar.into()).build().unwrap();
-    let res:serde_json::Value = client.post("https://api.live.bilibili.com/room/v1/Room/stopLive")
+        // 设置最大重试次数为4294967295次
+        let retry_policy = ExponentialBackoff::builder().build_with_max_retries(4294967295);
+        let raw_client = reqwest::Client::builder()
+        .cookie_store(true)
+        .cookie_provider(jar.into())
+        // 设置超时时间为30秒
+        .timeout(Duration::new(30, 0))
+        .build().unwrap();
+        let client = ClientBuilder::new(raw_client.clone())
+        .with(RetryTransientMiddleware::new_with_policy(retry_policy))
+        .build();
+    let _res:serde_json::Value = client.post("https://api.live.bilibili.com/room/v1/Room/stopLive")
     .header("Accept", "application/json, text/plain, */*")
     .header("content-type", "application/x-www-form-urlencoded; charset=UTF-8")
     .body(format!("room_id={}&platform=pc&csrf_token={}&csrf={}",cfg.bililive.room,cfg.bililive.bili_jct,cfg.bililive.bili_jct)).send().await.unwrap().json().await.unwrap();
-    println!("{:#?}",res);
+    // println!("{:#?}",res);
 }
 
 
