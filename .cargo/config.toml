@@ -1,5 +1,0 @@
-[build]
-target = "aarch64-unknown-linux-gnu"
-
-[target.aarch64-unknown-linux-gnu]
-linker = "D:\\arm\\gcc-arm-10.2-2020.11-mingw-w64-i686-aarch64-none-linux-gnu.tar\\gcc-arm-10.2-2020.11-mingw-w64-i686-aarch64-none-linux-gnu\\bin\\aarch64-none-linux-gnu-gcc.exe"

@@ -7,11 +7,13 @@ use std::{time::{Duration,}};
 use tokio;
 use std::path::Path;
 use reqwest::{cookie::Jar, Url};
+use reqwest_retry::policies::ExponentialBackoff;
+use reqwest_retry::RetryTransientMiddleware;
+use reqwest_middleware::{ClientBuilder};
 use tracing_subscriber::{filter::EnvFilter,fmt, layer::SubscriberExt, util::SubscriberInitExt};
 use std::process::Command;
 use config::{load_config,Config};
 
-// }
 #[tokio::main]
 async fn main() {
 
@@ -36,7 +38,7 @@ async fn main() {
                 tracing::info!("B站已开播");
                 ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap());
                 loop {
-                    if r.get_status() {
+                    if r.get_status().await.unwrap_or(false) {
                         ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap());
                         bili_stop_live(&cfg).await;
                         tracing::info!("B站已关播");
