@@ -38,10 +38,8 @@ async fn main() {
                 tracing::info!("B站已开播");
                 ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap());
                 loop {
-                    if r.get_status().await.unwrap_or(false) {
+                    if r.get_status().await {
                         ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap());
-                        bili_stop_live(&cfg).await;
-                        tracing::info!("B站已关播");
                     }else{
                         break;
                     }
