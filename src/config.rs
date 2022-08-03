@@ -15,7 +15,7 @@ pub struct Config {
     #[serde(rename = "Platform")]
     pub platform: String,
     #[serde(rename = "Push")]
-    pub push: Push,
+    pub push: Option<Push>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

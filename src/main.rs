@@ -29,15 +29,26 @@ async fn main() {
     let r = select_live(cfg.clone()).unwrap();
     // 设置tracing日志等级为Info
 
+    
     loop {
         if r.get_status().await.unwrap_or(false) {
             tracing::info!("{}", format!("{}直播中",r.room()));
-            if cfg.push.host.clone()=="~"|| cfg.push.target.clone()=="~" {
-                tracing::info!("如需使用推送请在config.yaml中配置push.host");
-            }else {
-                let p = Mirai::new(cfg.push.host.clone(), cfg.push.target.clone()); 
-                p.send_message(r.room().to_string(),cfg.bililive.room.to_string()).await;
-            }
+
+            match cfg.push {
+                Some(ref push) => {
+
+                    if push.host.clone()=="~"|| push.target.clone()=="~" {
+                        tracing::info!("如需使用推送请在config.yaml中配置push.host");
+                    }else {
+                        let p = Mirai::new(push.host.clone(), push.target.clone()); 
+                        p.send_message(r.room().to_string(),cfg.bililive.room.to_string()).await;
+                    }
+
+                }
+                None => {
+                    tracing::info!("如需使用推送请在config.yaml中配置push.host");
+                }
+            };
 
             if get_bili_live_state(cfg.bililive.room.clone()).await {
                 tracing::info!("B站直播中");
