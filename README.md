@@ -18,7 +18,7 @@ cd bilistream-v0.1.0-aarch64-linux
 touch config.yaml
 ```
 
-将一下填写至`config.yaml`文件内
+将以下内容填写至`config.yaml`文件内
 
 ``` yaml
 # 检测直播间隔
@@ -42,4 +42,10 @@ Twitch:
 Youtube:
   Room: 
   AccessToken: 
+# QQ群推送功能,需在本地部署QQ机器人
+Push:
+  # 本地QQ机器人的Api地址: 127.0.0.1:8080
+  Host: 127.0.0.1:8080
+  # 推送到的qq群号
+  Target:
 ```

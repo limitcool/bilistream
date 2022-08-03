@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::path::Path;
 
-#[derive(Debug, Serialize, Deserialize,Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
     #[serde(rename = "BiliLive")]
     pub bililive: BiliLive,
@@ -14,6 +14,8 @@ pub struct Config {
     pub youtube: YoutubeC,
     #[serde(rename = "Platform")]
     pub platform: String,
+    #[serde(rename = "Push")]
+    pub push: Push,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -32,13 +34,13 @@ pub struct BiliLive {
     #[serde(rename = "BiliRtmpKey")]
     pub bili_rtmp_key: String,
 }
-#[derive(Debug, Serialize, Deserialize,Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TwitchC {
     #[serde(rename = "Room")]
     pub room: String,
 }
 
-#[derive(Debug, Serialize, Deserialize,Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct YoutubeC {
     #[serde(rename = "Room")]
     pub room: String,
@@ -46,6 +48,13 @@ pub struct YoutubeC {
     pub access_token: String,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Push {
+    #[serde(rename = "Host")]
+    pub host: String,
+    #[serde(rename = "Target")]
+    pub target: String,
+}
 // 读取配置文件
 pub fn load_config(config: &Path) -> Result<Config, Box<dyn Error>> {
     let file = std::fs::File::open(config)?;

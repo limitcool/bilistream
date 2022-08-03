@@ -6,6 +6,8 @@ use serde_json::json;
 use std::error::Error;
 use urlencoding::encode;
 
+use super::Live;
+
 pub struct Twitch {
     pub room: String,
     pub client: ClientWithMiddleware,
@@ -17,7 +19,6 @@ struct Token {
     pub expire: String,
     pub sig: String,
 }
-use crate::live::Live;
 #[async_trait]
 impl Live for Twitch {
     async fn get_status(&self) -> Result<bool, Box<dyn Error>> {
@@ -82,6 +83,12 @@ impl Live for Twitch {
 }
 
 impl Twitch {
+    pub fn new(room: &str, client: ClientWithMiddleware) -> impl Live {
+        return Twitch {
+            room: room.to_string(),
+            client: client,
+        };
+    }
     async fn get_m3u8_url(&self, token: Token) -> Result<String, Box<dyn Error>> {
         let num = rand::thread_rng().gen_range(1..9000000);
         let url=  format!("https://usher.ttvnw.net/api/channel/hls/{}.m3u8?allow_audio_only=true&allow_source=true&allow_spectre=true&p={}&player=twitchweb&segment_preference=4&sig={}&token={}", self.room,num+1000000, token.sig,encode(token.token.as_str()).to_string());
@@ -99,11 +106,4 @@ impl Twitch {
 #[allow(dead_code)]
 pub fn name(item: &impl Live) -> String {
     return "Twitch:".to_string() + &item.room().to_string();
-}
-
-pub fn new(room: &str,client:ClientWithMiddleware) -> impl crate::live::Live {
-    return Twitch {
-        room: room.to_string(),
-        client: client,
-    }
 }

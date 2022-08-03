@@ -1,9 +1,10 @@
-mod twitch;
-mod live;
 mod config;
-mod youtube;
+mod plugins;
+mod push;
 // use tracing::info;
 use std::{time::{Duration,}};
+use plugins::select_live;
+use push::Mirai;
 use tokio;
 use std::path::Path;
 use reqwest::{cookie::Jar, Url};
@@ -14,9 +15,10 @@ use tracing_subscriber::{filter::EnvFilter,fmt, layer::SubscriberExt, util::Subs
 use std::process::Command;
 use config::{load_config,Config};
 
+
 #[tokio::main]
 async fn main() {
-
+    // let p = Mirai::new(host, target);
     let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
     // 只有注册 subscriber 后， 才能在控制台上看到日志输出
     tracing_subscriber::registry()
@@ -24,11 +26,19 @@ async fn main() {
     .with(fmt::layer())
     .init();
     let cfg = load_config(Path::new("./config.yaml")).unwrap();
-    let r = live::select_live(cfg.clone()).unwrap();
+    let r = select_live(cfg.clone()).unwrap();
     // 设置tracing日志等级为Info
+
     loop {
         if r.get_status().await.unwrap_or(false) {
             tracing::info!("{}", format!("{}直播中",r.room()));
+            if cfg.push.host.clone()=="~"|| cfg.push.target.clone()=="~" {
+                tracing::info!("如需使用推送请在config.yaml中配置push.host");
+            }else {
+                let p = Mirai::new(cfg.push.host.clone(), cfg.push.target.clone()); 
+                p.send_message(r.room().to_string(),cfg.bililive.room.to_string()).await;
+            }
+
             if get_bili_live_state(cfg.bililive.room.clone()).await {
                 tracing::info!("B站直播中");
                 ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap());
@@ -38,7 +48,7 @@ async fn main() {
                 tracing::info!("B站已开播");
                 ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap());
                 loop {
-                    if r.get_status().await {
+                    if r.get_status().await.unwrap() {
                         ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap());
                     }else{
                         break;
@@ -57,6 +67,7 @@ async fn main() {
         // 每60秒检测一下直播状态
         tokio::time::sleep(Duration::from_secs(cfg.interval)).await;
     }
+    
 
 }
 
@@ -147,7 +158,7 @@ pub fn ffmpeg(rtmp_url:String,rtmp_key:String,m3u8_url:String){
     let mut command =Command::new("ffmpeg");
     command.arg("-re");
     command.arg("-i");
-    command.arg(m3u8_url);
+    command.arg(m3u8_url.clone());
     command.arg("-vcodec");
     command.arg("copy");
     command.arg("-acodec");
@@ -158,6 +169,11 @@ pub fn ffmpeg(rtmp_url:String,rtmp_key:String,m3u8_url:String){
     match command.status().unwrap().code() {
     Some(code) => {
         println!("Exit Status: {}", code);
+        if code == 0 {
+            println!("Command executed successfully");
+        } else {
+            ffmpeg(rtmp_url, rtmp_key, m3u8_url)
+        }
     }
     None => {
         println!("Process terminated.");
