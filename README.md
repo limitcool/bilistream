@@ -2,7 +2,7 @@
 
 # bilistream
 
-B站直播转播工具,,一键转播Twitch,Youtube,Mildom等直播。(目前支持Twitch,Youtube)
+B站直播转播工具,,一键转播Twitch,Youtube(支持youtube预告类型直播自动转播)
 
 ## 使用指南
 
