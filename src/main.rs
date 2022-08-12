@@ -3,7 +3,7 @@ mod plugins;
 mod push;
 // use tracing::info;
 use std::{time::{Duration,}};
-use plugins::select_live;
+use plugins::{select_live, get_live_id};
 use push::Mirai;
 use tokio;
 use std::path::Path;
@@ -26,7 +26,7 @@ async fn main() {
     .with(fmt::layer())
     .init();
     let cfg = load_config(Path::new("./config.yaml")).unwrap();
-    let r = select_live(cfg.clone()).unwrap();
+    let r = select_live(cfg.clone()).await.unwrap();
     // 设置tracing日志等级为Info
 
     

@@ -23,7 +23,7 @@ touch config.yaml
 ``` yaml
 # 检测直播间隔
 Interval: 60
-# 需要转播的平台
+# 需要转播的平台 Twitch || Youtube || YoutubePreviewLive
 Platform: Twitch
 # B站推流账号Cookie
 BiliLive:
@@ -42,6 +42,9 @@ Twitch:
 Youtube:
   Room: 
   AccessToken: 
+# youtube 预告类型直播转播请填写以下内容
+YoutubePreviewLive:
+  ChannelId: UC1zFJrfEKvCixhsjNSb1toQ
 # QQ群推送功能,需在本地部署QQ机器人
 Push:
   # 本地QQ机器人的Api地址: 127.0.0.1:8080

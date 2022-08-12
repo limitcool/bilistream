@@ -1,6 +1,6 @@
 [package]
 name = "bilistream"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -10,29 +10,30 @@ reqwest-middleware = "0.1.6"
 reqwest-retry = "0.1.5"
 tokio = { version = "1", features = ["full"] }
 tokio-test = "0.4.2"
-serde = { version = "1.0.137",features = ["derive"] }
+serde = { version = "1.0.137", features = ["derive"] }
 serde_json = "1.0.81"
 serde_yaml = "0.8"
 # execute = "0.2.11"
-
-
-
-
-
-
-
-
-tracing = {version="0.1.35",features = ["max_level_debug", "release_max_level_info"]}
+scraper = "0.13.0"
+serde_derive = "1.0.143"
+tracing = { version = "0.1.35", features = [
+    "max_level_debug",
+    "release_max_level_info",
+] }
 tracing-subscriber = "0.2.0"
 async-trait = "0.1.56"
 urlencoding = "2.1.0"
 m3u8-rs = "4.0.0"
 rand = "0.8.5"
-regex = "1.5.6"
-
+regex = "1.6.0"
+prettyish-html = "0.1.0"
 # 添加arm交叉编译时不使用openssl 更换为rustls-tls
 [target.'cfg(any(all(target_arch="aarch64", target_vendor="unknown", target_os="linux"), target_env="musl"))'.dependencies]
-reqwest = { version = "0.11", default-features = false, features = ["json","cookies", "rustls-tls"] }
+reqwest = { version = "0.11", default-features = false, features = [
+    "json",
+    "cookies",
+    "rustls-tls",
+] }
 
 [target.'cfg(not(any(all(target_arch="aarch64", target_vendor="unknown", target_os="linux"), target_env="musl")))'.dependencies]
-reqwest = { version = "0.11", features = ["cookies","json"] }
+reqwest = { version = "0.11", features = ["cookies", "json"] }

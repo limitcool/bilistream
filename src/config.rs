@@ -16,6 +16,8 @@ pub struct Config {
     pub platform: String,
     #[serde(rename = "Push")]
     pub push: Option<Push>,
+    #[serde(rename = "YoutubePreviewLive")]
+    pub youtube_preview_live: YoutubePreviewLive,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -55,6 +57,14 @@ pub struct Push {
     #[serde(rename = "Target")]
     pub target: String,
 }
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct YoutubePreviewLive {
+    #[serde(rename = "ChannelId")]
+    pub channel_id: String,
+}
+
 // 读取配置文件
 pub fn load_config(config: &Path) -> Result<Config, Box<dyn Error>> {
     let file = std::fs::File::open(config)?;
