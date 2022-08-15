@@ -1,3663 +1,2532 @@
-use serde_derive::Deserialize;
-use serde_derive::Serialize;
+// Example code that deserializes and serializes the model.
+// extern crate serde;
+// #[macro_use]
+// extern crate serde_derive;
+// extern crate serde_json;
+//
+// use generated_module::[object Object];
+//
+// fn main() {
+//     let json = r#"{"answer": 42}"#;
+//     let model: [object Object] = serde_json::from_str(&json).unwrap();
+// }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Root {
+use serde::{Serialize, Deserialize};
+use serde_derive;
+
+#[derive(Serialize, Deserialize)]
+pub struct Welcome {
+    #[serde(rename = "responseContext")]
     pub response_context: ResponseContext,
+
+    #[serde(rename = "contents")]
     pub contents: Contents,
+
+    #[serde(rename = "header")]
     pub header: Header,
+
+    #[serde(rename = "metadata")]
     pub metadata: Metadata,
+
+    #[serde(rename = "trackingParams")]
     pub tracking_params: String,
+
+    #[serde(rename = "topbar")]
     pub topbar: Topbar,
+
+    #[serde(rename = "microformat")]
     pub microformat: Microformat,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ResponseContext {
-    pub service_tracking_params: Vec<ServiceTrackingParam>,
-    pub max_age_seconds: i64,
-    pub main_app_web_response_context: MainAppWebResponseContext,
-    pub web_response_context_extension_data: WebResponseContextExtensionData,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ServiceTrackingParam {
-    pub service: String,
-    pub params: Vec<Param>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Param {
-    pub key: String,
-    pub value: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MainAppWebResponseContext {
-    pub logged_out: bool,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebResponseContextExtensionData {
-    pub yt_config_data: YtConfigData,
-    pub has_decorated: bool,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct YtConfigData {
-    pub visitor_data: String,
-    pub root_visual_element_type: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct Contents {
+    #[serde(rename = "twoColumnBrowseResultsRenderer")]
     pub two_column_browse_results_renderer: TwoColumnBrowseResultsRenderer,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct TwoColumnBrowseResultsRenderer {
+    #[serde(rename = "tabs")]
     pub tabs: Vec<Tab>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct Tab {
-    pub tab_renderer: TabRenderer,
-    pub expandable_tab_renderer: ExpandableTabRenderer,
+    #[serde(rename = "tabRenderer")]
+    pub tab_renderer: Option<TabRenderer>,
+
+    #[serde(rename = "expandableTabRenderer")]
+    pub expandable_tab_renderer: Option<ExpandableTabRenderer>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct TabRenderer {
-    pub endpoint: Endpoint,
+#[derive(Serialize, Deserialize)]
+pub struct ExpandableTabRenderer {
+    #[serde(rename = "endpoint")]
+    pub endpoint: NextEndpointClass,
+
+    #[serde(rename = "title")]
     pub title: String,
+
+    #[serde(rename = "selected")]
     pub selected: bool,
-    pub content: Content,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct NextEndpointClass {
+    #[serde(rename = "clickTrackingParams")]
+    pub click_tracking_params: String,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: EndpointCommandMetadata,
+
+    #[serde(rename = "browseEndpoint")]
+    pub browse_endpoint: NextEndpointBrowseEndpoint,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct NextEndpointBrowseEndpoint {
+    #[serde(rename = "browseId")]
+    pub browse_id: Id,
+
+    #[serde(rename = "params")]
+    pub params: Option<String>,
+
+    #[serde(rename = "canonicalBaseUrl")]
+    pub canonical_base_url: Option<CanonicalBaseUrl>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct EndpointCommandMetadata {
+    #[serde(rename = "webCommandMetadata")]
+    pub web_command_metadata: PurpleWebCommandMetadata,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct PurpleWebCommandMetadata {
+    #[serde(rename = "url")]
+    pub url: String,
+
+    #[serde(rename = "webPageType")]
+    pub web_page_type: WebPageType,
+
+    #[serde(rename = "rootVe")]
+    pub root_ve: i64,
+
+    #[serde(rename = "apiUrl")]
+    pub api_url: Option<PurpleApiUrl>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct TabRenderer {
+    #[serde(rename = "endpoint")]
+    pub endpoint: NextEndpointClass,
+
+    #[serde(rename = "title")]
+    pub title: String,
+
+    #[serde(rename = "selected")]
+    pub selected: Option<bool>,
+
+    #[serde(rename = "content")]
+    pub content: Option<TabRendererContent>,
+
+    #[serde(rename = "trackingParams")]
     pub tracking_params: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Endpoint {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata,
-    pub browse_endpoint: BrowseEndpoint,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata {
-    pub web_command_metadata: WebCommandMetadata,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-    pub api_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowseEndpoint {
-    pub browse_id: String,
-    pub params: String,
-    pub canonical_base_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Content {
+#[derive(Serialize, Deserialize)]
+pub struct TabRendererContent {
+    #[serde(rename = "sectionListRenderer")]
     pub section_list_renderer: SectionListRenderer,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct SectionListRenderer {
-    pub contents: Vec<Content2>,
+    #[serde(rename = "contents")]
+    pub contents: Vec<SectionListRendererContent>,
+
+    #[serde(rename = "trackingParams")]
     pub tracking_params: String,
+
+    #[serde(rename = "targetId")]
     pub target_id: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Content2 {
+#[derive(Serialize, Deserialize)]
+pub struct SectionListRendererContent {
+    #[serde(rename = "itemSectionRenderer")]
     pub item_section_renderer: ItemSectionRenderer,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct ItemSectionRenderer {
-    pub contents: Vec<Content3>,
+    #[serde(rename = "contents")]
+    pub contents: Vec<ItemSectionRendererContent>,
+
+    #[serde(rename = "trackingParams")]
     pub tracking_params: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Content3 {
-    pub channel_video_player_renderer: ChannelVideoPlayerRenderer,
-    pub shelf_renderer: ShelfRenderer,
-    pub reel_shelf_renderer: ReelShelfRenderer,
+#[derive(Serialize, Deserialize)]
+pub struct ItemSectionRendererContent {
+    #[serde(rename = "channelVideoPlayerRenderer")]
+    pub channel_video_player_renderer: Option<ChannelVideoPlayerRenderer>,
+
+    #[serde(rename = "shelfRenderer")]
+    pub shelf_renderer: Option<ShelfRenderer>,
+
+    #[serde(rename = "reelShelfRenderer")]
+    pub reel_shelf_renderer: Option<ReelShelfRenderer>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct ChannelVideoPlayerRenderer {
+    #[serde(rename = "videoId")]
     pub video_id: String,
-    pub title: Title,
+
+    #[serde(rename = "title")]
+    pub title: PurpleTitle,
+
+    #[serde(rename = "description")]
     pub description: Description,
-    pub view_count_text: ViewCountText,
-    pub published_time_text: PublishedTimeText,
+
+    #[serde(rename = "viewCountText")]
+    pub view_count_text: ContentClass,
+
+    #[serde(rename = "publishedTimeText")]
+    pub published_time_text: TextClass,
+
+    #[serde(rename = "readMoreText")]
     pub read_more_text: ReadMoreText,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Title {
-    pub runs: Vec<Run>,
-    pub accessibility: Accessibility,
+#[derive(Serialize, Deserialize)]
+pub struct Description {
+    #[serde(rename = "runs")]
+    pub runs: Vec<DescriptionRun>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run {
+#[derive(Serialize, Deserialize)]
+pub struct DescriptionRun {
+    #[serde(rename = "text")]
     pub text: String,
-    pub navigation_endpoint: NavigationEndpoint,
+
+    #[serde(rename = "navigationEndpoint")]
+    pub navigation_endpoint: Option<PrimaryLinkNavigationEndpoint>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata2,
-    pub watch_endpoint: WatchEndpoint,
+#[derive(Serialize, Deserialize)]
+pub struct PrimaryLinkNavigationEndpoint {
+    #[serde(rename = "clickTrackingParams")]
+    pub click_tracking_params: TrackingParams,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: EndpointCommandMetadata,
+
+    #[serde(rename = "watchEndpoint")]
+    pub watch_endpoint: Option<PurpleWatchEndpoint>,
+
+    #[serde(rename = "urlEndpoint")]
+    pub url_endpoint: Option<UrlEndpoint>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata2 {
-    pub web_command_metadata: WebCommandMetadata2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata2 {
+#[derive(Serialize, Deserialize)]
+pub struct UrlEndpoint {
+    #[serde(rename = "url")]
     pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
+
+    #[serde(rename = "target")]
+    pub target: Target,
+
+    #[serde(rename = "nofollow")]
+    pub nofollow: bool,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WatchEndpoint {
+#[derive(Serialize, Deserialize)]
+pub struct PurpleWatchEndpoint {
+    #[serde(rename = "videoId")]
     pub video_id: String,
+
+    #[serde(rename = "startTimeSeconds")]
+    pub start_time_seconds: i64,
+
+    #[serde(rename = "watchEndpointSupportedOnesieConfig")]
     pub watch_endpoint_supported_onesie_config: WatchEndpointSupportedOnesieConfig,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct WatchEndpointSupportedOnesieConfig {
     #[serde(rename = "html5PlaybackOnesieConfig")]
-    pub html5playback_onesie_config: Html5PlaybackOnesieConfig,
+    pub html5_playback_onesie_config: Html5PlaybackOnesieConfig,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct Html5PlaybackOnesieConfig {
-    pub common_config: CommonConfig,
+    #[serde(rename = "commonConfig")]
+    pub common_config: CommonConfigElement,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommonConfig {
+#[derive(Serialize, Deserialize)]
+pub struct CommonConfigElement {
+    #[serde(rename = "url")]
     pub url: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Accessibility {
-    pub accessibility_data: AccessibilityData,
+#[derive(Serialize, Deserialize)]
+pub struct TextClass {
+    #[serde(rename = "runs")]
+    pub runs: Vec<TextRun>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Description {
-    pub runs: Vec<Run2>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run2 {
-    pub text: String,
-    pub navigation_endpoint: NavigationEndpoint2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint2 {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata3,
-    pub url_endpoint: UrlEndpoint,
-    pub watch_endpoint: WatchEndpoint2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata3 {
-    pub web_command_metadata: WebCommandMetadata3,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata3 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UrlEndpoint {
-    pub url: String,
-    pub target: String,
-    pub nofollow: bool,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WatchEndpoint2 {
-    pub video_id: String,
-    pub start_time_seconds: i64,
-    pub watch_endpoint_supported_onesie_config: WatchEndpointSupportedOnesieConfig2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WatchEndpointSupportedOnesieConfig2 {
-    #[serde(rename = "html5PlaybackOnesieConfig")]
-    pub html5playback_onesie_config: Html5PlaybackOnesieConfig2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Html5PlaybackOnesieConfig2 {
-    pub common_config: CommonConfig2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommonConfig2 {
-    pub url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewCountText {
-    pub simple_text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PublishedTimeText {
-    pub runs: Vec<Run3>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run3 {
+#[derive(Serialize, Deserialize)]
+pub struct TextRun {
+    #[serde(rename = "text")]
     pub text: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct ReadMoreText {
-    pub runs: Vec<Run4>,
+    #[serde(rename = "runs")]
+    pub runs: Vec<ReadMoreTextRun>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run4 {
+#[derive(Serialize, Deserialize)]
+pub struct ReadMoreTextRun {
+    #[serde(rename = "text")]
     pub text: String,
-    pub navigation_endpoint: NavigationEndpoint3,
+
+    #[serde(rename = "navigationEndpoint")]
+    pub navigation_endpoint: GridVideoRendererNavigationEndpoint,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint3 {
+#[derive(Serialize, Deserialize)]
+pub struct GridVideoRendererNavigationEndpoint {
+    #[serde(rename = "clickTrackingParams")]
     pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata4,
-    pub watch_endpoint: WatchEndpoint3,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: EndpointCommandMetadata,
+
+    #[serde(rename = "watchEndpoint")]
+    pub watch_endpoint: FluffyWatchEndpoint,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata4 {
-    pub web_command_metadata: WebCommandMetadata4,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata4 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WatchEndpoint3 {
+#[derive(Serialize, Deserialize)]
+pub struct FluffyWatchEndpoint {
+    #[serde(rename = "videoId")]
     pub video_id: String,
-    pub watch_endpoint_supported_onesie_config: WatchEndpointSupportedOnesieConfig3,
+
+    #[serde(rename = "watchEndpointSupportedOnesieConfig")]
+    pub watch_endpoint_supported_onesie_config: WatchEndpointSupportedOnesieConfig,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WatchEndpointSupportedOnesieConfig3 {
-    #[serde(rename = "html5PlaybackOnesieConfig")]
-    pub html5playback_onesie_config: Html5PlaybackOnesieConfig3,
+#[derive(Serialize, Deserialize)]
+pub struct PurpleTitle {
+    #[serde(rename = "runs")]
+    pub runs: Vec<ReadMoreTextRun>,
+
+    #[serde(rename = "accessibility")]
+    pub accessibility: HotkeyAccessibilityLabelClass,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Html5PlaybackOnesieConfig3 {
-    pub common_config: CommonConfig3,
+#[derive(Serialize, Deserialize)]
+pub struct HotkeyAccessibilityLabelClass {
+    #[serde(rename = "accessibilityData")]
+    pub accessibility_data: AccessibilityAccessibilityData,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommonConfig3 {
-    pub url: String,
+#[derive(Serialize, Deserialize)]
+pub struct AccessibilityAccessibilityData {
+    #[serde(rename = "label")]
+    pub label: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ShelfRenderer {
-    pub title: Title2,
-    pub endpoint: Endpoint2,
-    pub content: Content4,
-    pub subtitle: Option<Subtitle>,
-    pub tracking_params: String,
-    pub play_all_button: Option<PlayAllButton>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Title2 {
-    pub runs: Vec<Run5>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run5 {
-    pub text: String,
-    pub navigation_endpoint: NavigationEndpoint4,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint4 {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata5,
-    pub browse_endpoint: BrowseEndpoint2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata5 {
-    pub web_command_metadata: WebCommandMetadata5,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata5 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-    pub api_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowseEndpoint2 {
-    pub browse_id: String,
-    pub params: Option<String>,
-    pub canonical_base_url: Option<String>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Endpoint2 {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata6,
-    pub browse_endpoint: BrowseEndpoint3,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata6 {
-    pub web_command_metadata: WebCommandMetadata6,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata6 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-    pub api_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowseEndpoint3 {
-    pub browse_id: String,
-    pub params: Option<String>,
-    pub canonical_base_url: Option<String>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Content4 {
-    pub horizontal_list_renderer: HorizontalListRenderer,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct HorizontalListRenderer {
-    pub items: Vec<Item>,
-    pub tracking_params: String,
-    pub visible_item_count: i64,
-    pub next_button: NextButton,
-    pub previous_button: PreviousButton,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Item {
-    pub grid_video_renderer: Option<GridVideoRenderer>,
-    pub grid_playlist_renderer: Option<GridPlaylistRenderer>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct GridVideoRenderer {
-    pub video_id: String,
-    pub thumbnail: Thumbnail,
-    pub title: Title3,
-    pub published_time_text: Option<PublishedTimeText2>,
-    pub view_count_text: Option<ViewCountText2>,
-    pub navigation_endpoint: NavigationEndpoint5,
-    pub short_byline_text: Option<ShortBylineText>,
-    pub owner_badges: Vec<OwnerBadge>,
-    pub tracking_params: String,
-    pub short_view_count_text: Option<ShortViewCountText>,
-    pub menu: Menu,
-    pub thumbnail_overlays: Vec<ThumbnailOverlay>,
-    #[serde(default)]
-    pub badges: Vec<Badge>,
-    pub upcoming_event_data: Option<UpcomingEventData>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail {
-    pub thumbnails: Vec<Thumbnail2>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail2 {
-    pub url: String,
-    pub width: i64,
-    pub height: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Title3 {
-    pub accessibility: Accessibility2,
+#[derive(Serialize, Deserialize)]
+pub struct ContentClass {
+    #[serde(rename = "simpleText")]
     pub simple_text: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Accessibility2 {
-    pub accessibility_data: AccessibilityData2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData2 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PublishedTimeText2 {
-    pub simple_text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewCountText2 {
-    pub simple_text: Option<String>,
-    pub runs: Option<Vec<Run6>>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run6 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint5 {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata7,
-    pub watch_endpoint: WatchEndpoint4,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata7 {
-    pub web_command_metadata: WebCommandMetadata7,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata7 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WatchEndpoint4 {
-    pub video_id: String,
-    pub watch_endpoint_supported_onesie_config: WatchEndpointSupportedOnesieConfig4,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WatchEndpointSupportedOnesieConfig4 {
-    #[serde(rename = "html5PlaybackOnesieConfig")]
-    pub html5playback_onesie_config: Html5PlaybackOnesieConfig4,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Html5PlaybackOnesieConfig4 {
-    pub common_config: CommonConfig4,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommonConfig4 {
-    pub url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ShortBylineText {
-    pub runs: Vec<Run7>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run7 {
-    pub text: String,
-    pub navigation_endpoint: NavigationEndpoint6,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint6 {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata8,
-    pub browse_endpoint: BrowseEndpoint4,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata8 {
-    pub web_command_metadata: WebCommandMetadata8,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata8 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-    pub api_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowseEndpoint4 {
-    pub browse_id: String,
-    pub canonical_base_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct OwnerBadge {
-    pub metadata_badge_renderer: MetadataBadgeRenderer,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MetadataBadgeRenderer {
-    pub icon: Icon,
-    pub style: String,
-    pub tooltip: String,
-    pub tracking_params: String,
-    pub accessibility_data: AccessibilityData3,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon {
-    pub icon_type: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData3 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ShortViewCountText {
-    pub accessibility: Option<Accessibility3>,
-    pub simple_text: Option<String>,
-    pub runs: Option<Vec<Run8>>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Accessibility3 {
-    pub accessibility_data: AccessibilityData4,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData4 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run8 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Menu {
-    pub menu_renderer: MenuRenderer,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MenuRenderer {
-    pub items: Vec<Item2>,
-    pub tracking_params: String,
-    pub accessibility: Accessibility4,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Item2 {
-    pub menu_service_item_renderer: MenuServiceItemRenderer,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MenuServiceItemRenderer {
-    pub text: Text,
-    pub icon: Icon2,
-    pub service_endpoint: ServiceEndpoint,
-    pub tracking_params: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Text {
-    pub runs: Vec<Run9>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run9 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon2 {
-    pub icon_type: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ServiceEndpoint {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata9,
-    pub signal_service_endpoint: SignalServiceEndpoint,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata9 {
-    pub web_command_metadata: WebCommandMetadata9,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata9 {
-    pub send_post: bool,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SignalServiceEndpoint {
-    pub signal: String,
-    pub actions: Vec<Action>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Action {
-    pub click_tracking_params: String,
-    pub add_to_playlist_command: AddToPlaylistCommand,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AddToPlaylistCommand {
-    pub open_miniplayer: bool,
-    pub video_id: String,
-    pub list_type: String,
-    pub on_create_list_command: OnCreateListCommand,
-    pub video_ids: Vec<String>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct OnCreateListCommand {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata10,
-    pub create_playlist_service_endpoint: CreatePlaylistServiceEndpoint,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata10 {
-    pub web_command_metadata: WebCommandMetadata10,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata10 {
-    pub send_post: bool,
-    pub api_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CreatePlaylistServiceEndpoint {
-    pub video_ids: Vec<String>,
-    pub params: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Accessibility4 {
-    pub accessibility_data: AccessibilityData5,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData5 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ThumbnailOverlay {
-    pub thumbnail_overlay_time_status_renderer: Option<ThumbnailOverlayTimeStatusRenderer>,
-    pub thumbnail_overlay_toggle_button_renderer: Option<ThumbnailOverlayToggleButtonRenderer>,
-    pub thumbnail_overlay_now_playing_renderer: Option<ThumbnailOverlayNowPlayingRenderer>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ThumbnailOverlayTimeStatusRenderer {
-    pub text: Text2,
-    pub style: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Text2 {
-    pub accessibility: Accessibility5,
-    pub simple_text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Accessibility5 {
-    pub accessibility_data: AccessibilityData6,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData6 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ThumbnailOverlayToggleButtonRenderer {
-    pub untoggled_icon: UntoggledIcon,
-    pub toggled_icon: ToggledIcon,
-    pub untoggled_tooltip: String,
-    pub toggled_tooltip: String,
-    pub untoggled_service_endpoint: UntoggledServiceEndpoint,
-    pub untoggled_accessibility: UntoggledAccessibility,
-    pub toggled_accessibility: ToggledAccessibility,
-    pub tracking_params: String,
-    pub is_toggled: Option<bool>,
-    pub toggled_service_endpoint: Option<ToggledServiceEndpoint>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UntoggledIcon {
-    pub icon_type: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ToggledIcon {
-    pub icon_type: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UntoggledServiceEndpoint {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata11,
-    pub signal_service_endpoint: Option<SignalServiceEndpoint2>,
-    pub playlist_edit_endpoint: Option<PlaylistEditEndpoint>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata11 {
-    pub web_command_metadata: WebCommandMetadata11,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata11 {
-    pub send_post: bool,
-    pub api_url: Option<String>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SignalServiceEndpoint2 {
-    pub signal: String,
-    pub actions: Vec<Action2>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Action2 {
-    pub click_tracking_params: String,
-    pub add_to_playlist_command: AddToPlaylistCommand2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AddToPlaylistCommand2 {
-    pub open_miniplayer: bool,
-    pub video_id: String,
-    pub list_type: String,
-    pub on_create_list_command: OnCreateListCommand2,
-    pub video_ids: Vec<String>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct OnCreateListCommand2 {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata12,
-    pub create_playlist_service_endpoint: CreatePlaylistServiceEndpoint2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata12 {
-    pub web_command_metadata: WebCommandMetadata12,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata12 {
-    pub send_post: bool,
-    pub api_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CreatePlaylistServiceEndpoint2 {
-    pub video_ids: Vec<String>,
-    pub params: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PlaylistEditEndpoint {
-    pub playlist_id: String,
-    pub actions: Vec<Action3>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Action3 {
-    pub added_video_id: String,
-    pub action: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UntoggledAccessibility {
-    pub accessibility_data: AccessibilityData7,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData7 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ToggledAccessibility {
-    pub accessibility_data: AccessibilityData8,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData8 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ToggledServiceEndpoint {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata13,
-    pub playlist_edit_endpoint: PlaylistEditEndpoint2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata13 {
-    pub web_command_metadata: WebCommandMetadata13,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata13 {
-    pub send_post: bool,
-    pub api_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PlaylistEditEndpoint2 {
-    pub playlist_id: String,
-    pub actions: Vec<Action4>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Action4 {
-    pub action: String,
-    pub removed_video_id: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ThumbnailOverlayNowPlayingRenderer {
-    pub text: Text3,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Text3 {
-    pub runs: Vec<Run10>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run10 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Badge {
-    pub metadata_badge_renderer: MetadataBadgeRenderer2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MetadataBadgeRenderer2 {
-    pub style: String,
-    pub label: String,
-    pub tracking_params: String,
-    pub accessibility_data: AccessibilityData9,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData9 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UpcomingEventData {
-    pub start_time: String,
-    pub is_reminder_set: bool,
-    pub upcoming_event_text: UpcomingEventText,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UpcomingEventText {
-    pub runs: Vec<Run11>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run11 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct GridPlaylistRenderer {
-    pub playlist_id: String,
-    pub thumbnail: Thumbnail3,
-    pub title: Title4,
-    pub video_count_text: VideoCountText,
-    pub navigation_endpoint: NavigationEndpoint8,
-    pub video_count_short_text: VideoCountShortText,
-    pub tracking_params: String,
-    pub sidebar_thumbnails: Vec<SidebarThumbnail>,
-    pub thumbnail_text: ThumbnailText,
-    pub owner_badges: Vec<OwnerBadge2>,
-    pub thumbnail_renderer: ThumbnailRenderer,
-    pub thumbnail_overlays: Vec<ThumbnailOverlay2>,
-    pub view_playlist_text: ViewPlaylistText,
-    pub published_time_text: Option<PublishedTimeText3>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail3 {
-    pub thumbnails: Vec<Thumbnail4>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail4 {
-    pub url: String,
-    pub width: i64,
-    pub height: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Title4 {
-    pub runs: Vec<Run12>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run12 {
-    pub text: String,
-    pub navigation_endpoint: NavigationEndpoint7,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint7 {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata14,
-    pub watch_endpoint: WatchEndpoint5,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata14 {
-    pub web_command_metadata: WebCommandMetadata14,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata14 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WatchEndpoint5 {
-    pub video_id: String,
-    pub playlist_id: String,
-    pub params: String,
-    pub logging_context: LoggingContext,
-    pub watch_endpoint_supported_onesie_config: WatchEndpointSupportedOnesieConfig5,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct LoggingContext {
-    pub vss_logging_context: VssLoggingContext,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct VssLoggingContext {
-    pub serialized_context_data: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WatchEndpointSupportedOnesieConfig5 {
-    #[serde(rename = "html5PlaybackOnesieConfig")]
-    pub html5playback_onesie_config: Html5PlaybackOnesieConfig5,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Html5PlaybackOnesieConfig5 {
-    pub common_config: CommonConfig5,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommonConfig5 {
-    pub url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct VideoCountText {
-    pub runs: Vec<Run13>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run13 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint8 {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata15,
-    pub watch_endpoint: WatchEndpoint6,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata15 {
-    pub web_command_metadata: WebCommandMetadata15,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata15 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WatchEndpoint6 {
-    pub video_id: String,
-    pub playlist_id: String,
-    pub params: String,
-    pub logging_context: LoggingContext2,
-    pub watch_endpoint_supported_onesie_config: WatchEndpointSupportedOnesieConfig6,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct LoggingContext2 {
-    pub vss_logging_context: VssLoggingContext2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct VssLoggingContext2 {
-    pub serialized_context_data: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WatchEndpointSupportedOnesieConfig6 {
-    #[serde(rename = "html5PlaybackOnesieConfig")]
-    pub html5playback_onesie_config: Html5PlaybackOnesieConfig6,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Html5PlaybackOnesieConfig6 {
-    pub common_config: CommonConfig6,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommonConfig6 {
-    pub url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct VideoCountShortText {
-    pub simple_text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SidebarThumbnail {
-    pub thumbnails: Vec<Thumbnail5>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail5 {
-    pub url: String,
-    pub width: i64,
-    pub height: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ThumbnailText {
-    pub runs: Vec<Run14>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run14 {
-    pub text: String,
-    pub bold: Option<bool>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct OwnerBadge2 {
-    pub metadata_badge_renderer: MetadataBadgeRenderer3,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MetadataBadgeRenderer3 {
-    pub icon: Icon3,
-    pub style: String,
-    pub tooltip: String,
-    pub tracking_params: String,
-    pub accessibility_data: AccessibilityData10,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon3 {
-    pub icon_type: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData10 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ThumbnailRenderer {
-    pub playlist_video_thumbnail_renderer: PlaylistVideoThumbnailRenderer,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PlaylistVideoThumbnailRenderer {
-    pub thumbnail: Thumbnail6,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail6 {
-    pub thumbnails: Vec<Thumbnail7>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail7 {
-    pub url: String,
-    pub width: i64,
-    pub height: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ThumbnailOverlay2 {
-    pub thumbnail_overlay_side_panel_renderer: Option<ThumbnailOverlaySidePanelRenderer>,
-    pub thumbnail_overlay_hover_text_renderer: Option<ThumbnailOverlayHoverTextRenderer>,
-    pub thumbnail_overlay_now_playing_renderer: Option<ThumbnailOverlayNowPlayingRenderer2>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ThumbnailOverlaySidePanelRenderer {
-    pub text: Text4,
-    pub icon: Icon4,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Text4 {
-    pub simple_text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon4 {
-    pub icon_type: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ThumbnailOverlayHoverTextRenderer {
-    pub text: Text5,
-    pub icon: Icon5,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Text5 {
-    pub runs: Vec<Run15>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run15 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon5 {
-    pub icon_type: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ThumbnailOverlayNowPlayingRenderer2 {
-    pub text: Text6,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Text6 {
-    pub runs: Vec<Run16>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run16 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewPlaylistText {
-    pub runs: Vec<Run17>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run17 {
-    pub text: String,
-    pub navigation_endpoint: NavigationEndpoint9,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint9 {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata16,
-    pub browse_endpoint: BrowseEndpoint5,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata16 {
-    pub web_command_metadata: WebCommandMetadata16,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata16 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-    pub api_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowseEndpoint5 {
-    pub browse_id: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PublishedTimeText3 {
-    pub simple_text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NextButton {
-    pub button_renderer: ButtonRenderer,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ButtonRenderer {
-    pub style: String,
-    pub size: String,
-    pub is_disabled: bool,
-    pub icon: Icon6,
-    pub accessibility: Accessibility6,
-    pub tracking_params: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon6 {
-    pub icon_type: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Accessibility6 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PreviousButton {
-    pub button_renderer: ButtonRenderer2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ButtonRenderer2 {
-    pub style: String,
-    pub size: String,
-    pub is_disabled: bool,
-    pub icon: Icon7,
-    pub accessibility: Accessibility7,
-    pub tracking_params: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon7 {
-    pub icon_type: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Accessibility7 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Subtitle {
-    pub simple_text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PlayAllButton {
-    pub button_renderer: ButtonRenderer3,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ButtonRenderer3 {
-    pub style: String,
-    pub size: String,
-    pub is_disabled: bool,
-    pub text: Text7,
-    pub icon: Icon8,
-    pub navigation_endpoint: NavigationEndpoint10,
-    pub tracking_params: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Text7 {
-    pub runs: Vec<Run18>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run18 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon8 {
-    pub icon_type: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint10 {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata17,
-    pub watch_endpoint: WatchEndpoint7,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata17 {
-    pub web_command_metadata: WebCommandMetadata17,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata17 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WatchEndpoint7 {
-    pub video_id: String,
-    pub playlist_id: String,
-    pub logging_context: LoggingContext3,
-    pub watch_endpoint_supported_onesie_config: WatchEndpointSupportedOnesieConfig7,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct LoggingContext3 {
-    pub vss_logging_context: VssLoggingContext3,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct VssLoggingContext3 {
-    pub serialized_context_data: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WatchEndpointSupportedOnesieConfig7 {
-    #[serde(rename = "html5PlaybackOnesieConfig")]
-    pub html5playback_onesie_config: Html5PlaybackOnesieConfig7,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Html5PlaybackOnesieConfig7 {
-    pub common_config: CommonConfig7,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommonConfig7 {
-    pub url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct ReelShelfRenderer {
-    pub title: Title5,
-    pub items: Vec<Item3>,
+    #[serde(rename = "title")]
+    pub title: TextClass,
+
+    #[serde(rename = "items")]
+    pub items: Vec<ReelShelfRendererItem>,
+
+    #[serde(rename = "trackingParams")]
     pub tracking_params: String,
-    pub icon: Icon10,
+
+    #[serde(rename = "icon")]
+    pub icon: IconImage,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Title5 {
-    pub runs: Vec<Run19>,
+#[derive(Serialize, Deserialize)]
+pub struct IconImage {
+    #[serde(rename = "iconType")]
+    pub icon_type: IconType,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run19 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Item3 {
+#[derive(Serialize, Deserialize)]
+pub struct ReelShelfRendererItem {
+    #[serde(rename = "reelItemRenderer")]
     pub reel_item_renderer: ReelItemRenderer,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct ReelItemRenderer {
+    #[serde(rename = "videoId")]
     pub video_id: String,
-    pub headline: Headline,
-    pub thumbnail: Thumbnail8,
-    pub view_count_text: ViewCountText3,
-    pub navigation_endpoint: NavigationEndpoint11,
-    pub menu: Menu2,
+
+    #[serde(rename = "headline")]
+    pub headline: ContentClass,
+
+    #[serde(rename = "thumbnail")]
+    pub thumbnail: ReelWatchEndpointThumbnail,
+
+    #[serde(rename = "viewCountText")]
+    pub view_count_text: SubscriberCountText,
+
+    #[serde(rename = "navigationEndpoint")]
+    pub navigation_endpoint: ReelItemRendererNavigationEndpoint,
+
+    #[serde(rename = "menu")]
+    pub menu: ReelItemRendererMenu,
+
+    #[serde(rename = "trackingParams")]
     pub tracking_params: String,
-    pub accessibility: Accessibility12,
-    pub style: String,
-    pub video_type: String,
-    pub logging_directives: LoggingDirectives2,
+
+    #[serde(rename = "accessibility")]
+    pub accessibility: HotkeyAccessibilityLabelClass,
+
+    #[serde(rename = "style")]
+    pub style: ReelItemRendererStyle,
+
+    #[serde(rename = "videoType")]
+    pub video_type: VideoType,
+
+    #[serde(rename = "loggingDirectives")]
+    pub logging_directives: LoggingDirectives,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Headline {
-    pub simple_text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail8 {
-    pub thumbnails: Vec<Thumbnail9>,
-    pub is_original_aspect_ratio: bool,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail9 {
-    pub url: String,
-    pub width: i64,
-    pub height: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewCountText3 {
-    pub accessibility: Accessibility8,
-    pub simple_text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Accessibility8 {
-    pub accessibility_data: AccessibilityData11,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData11 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint11 {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata18,
-    pub reel_watch_endpoint: ReelWatchEndpoint,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata18 {
-    pub web_command_metadata: WebCommandMetadata18,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata18 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ReelWatchEndpoint {
-    pub video_id: String,
-    pub player_params: String,
-    pub thumbnail: Thumbnail10,
-    pub overlay: Overlay,
-    pub params: String,
-    pub sequence_provider: String,
-    pub sequence_params: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail10 {
-    pub thumbnails: Vec<Thumbnail11>,
-    pub is_original_aspect_ratio: bool,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail11 {
-    pub url: String,
-    pub width: i64,
-    pub height: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Overlay {
-    pub reel_player_overlay_renderer: ReelPlayerOverlayRenderer,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ReelPlayerOverlayRenderer {
-    pub reel_player_header_supported_renderers: ReelPlayerHeaderSupportedRenderers,
-    pub next_item_button: NextItemButton,
-    pub prev_item_button: PrevItemButton,
-    pub style: String,
-    pub tracking_params: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ReelPlayerHeaderSupportedRenderers {
-    pub reel_player_header_renderer: ReelPlayerHeaderRenderer,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ReelPlayerHeaderRenderer {
-    pub reel_title_text: ReelTitleText,
-    pub timestamp_text: TimestampText,
-    pub channel_navigation_endpoint: ChannelNavigationEndpoint,
-    pub channel_title_text: ChannelTitleText,
-    pub channel_thumbnail: ChannelThumbnail,
-    pub tracking_params: String,
-    pub accessibility: Accessibility9,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ReelTitleText {
-    pub runs: Vec<Run20>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run20 {
-    pub text: String,
-    pub navigation_endpoint: Option<NavigationEndpoint12>,
-    pub logging_directives: Option<LoggingDirectives>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint12 {
-    pub click_tracking_params: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct LoggingDirectives {
+    #[serde(rename = "trackingParams")]
     pub tracking_params: String,
+
+    #[serde(rename = "visibility")]
     pub visibility: Visibility,
+
+    #[serde(rename = "enableDisplayloggerExperiment")]
     pub enable_displaylogger_experiment: bool,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct Visibility {
+    #[serde(rename = "types")]
     pub types: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct TimestampText {
-    pub simple_text: String,
+#[derive(Serialize, Deserialize)]
+pub struct ReelItemRendererMenu {
+    #[serde(rename = "menuRenderer")]
+    pub menu_renderer: PurpleMenuRenderer,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ChannelNavigationEndpoint {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata19,
-    pub browse_endpoint: BrowseEndpoint6,
-}
+#[derive(Serialize, Deserialize)]
+pub struct PurpleMenuRenderer {
+    #[serde(rename = "items")]
+    pub items: Vec<PurpleItem>,
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata19 {
-    pub web_command_metadata: WebCommandMetadata19,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata19 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-    pub api_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowseEndpoint6 {
-    pub browse_id: String,
-    pub canonical_base_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ChannelTitleText {
-    pub runs: Vec<Run21>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run21 {
-    pub text: String,
-    pub navigation_endpoint: NavigationEndpoint13,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint13 {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata20,
-    pub browse_endpoint: BrowseEndpoint7,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata20 {
-    pub web_command_metadata: WebCommandMetadata20,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata20 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-    pub api_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowseEndpoint7 {
-    pub browse_id: String,
-    pub canonical_base_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ChannelThumbnail {
-    pub thumbnails: Vec<Thumbnail12>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail12 {
-    pub url: String,
-    pub width: i64,
-    pub height: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Accessibility9 {
-    pub accessibility_data: AccessibilityData12,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData12 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NextItemButton {
-    pub button_renderer: ButtonRenderer4,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ButtonRenderer4 {
+    #[serde(rename = "trackingParams")]
     pub tracking_params: String,
+
+    #[serde(rename = "accessibility")]
+    pub accessibility: HotkeyAccessibilityLabelClass,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PrevItemButton {
-    pub button_renderer: ButtonRenderer5,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ButtonRenderer5 {
-    pub tracking_params: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Menu2 {
-    pub menu_renderer: MenuRenderer2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MenuRenderer2 {
-    pub items: Vec<Item4>,
-    pub tracking_params: String,
-    pub accessibility: Accessibility11,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Item4 {
+#[derive(Serialize, Deserialize)]
+pub struct PurpleItem {
+    #[serde(rename = "menuNavigationItemRenderer")]
     pub menu_navigation_item_renderer: MenuNavigationItemRenderer,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct MenuNavigationItemRenderer {
-    pub text: Text8,
-    pub icon: Icon9,
-    pub navigation_endpoint: NavigationEndpoint14,
+    #[serde(rename = "text")]
+    pub text: TextClass,
+
+    #[serde(rename = "icon")]
+    pub icon: IconImage,
+
+    #[serde(rename = "navigationEndpoint")]
+    pub navigation_endpoint: MenuNavigationItemRendererNavigationEndpoint,
+
+    #[serde(rename = "trackingParams")]
     pub tracking_params: String,
-    pub accessibility: Accessibility10,
+
+    #[serde(rename = "accessibility")]
+    pub accessibility: HotkeyAccessibilityLabelClass,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Text8 {
-    pub runs: Vec<Run22>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run22 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon9 {
-    pub icon_type: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint14 {
+#[derive(Serialize, Deserialize)]
+pub struct MenuNavigationItemRendererNavigationEndpoint {
+    #[serde(rename = "clickTrackingParams")]
     pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata21,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: PurpleCommandMetadata,
+
+    #[serde(rename = "userFeedbackEndpoint")]
     pub user_feedback_endpoint: UserFeedbackEndpoint,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata21 {
-    pub web_command_metadata: WebCommandMetadata21,
+#[derive(Serialize, Deserialize)]
+pub struct PurpleCommandMetadata {
+    #[serde(rename = "webCommandMetadata")]
+    pub web_command_metadata: FluffyWebCommandMetadata,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata21 {
+#[derive(Serialize, Deserialize)]
+pub struct FluffyWebCommandMetadata {
+    #[serde(rename = "ignoreNavigation")]
     pub ignore_navigation: bool,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct UserFeedbackEndpoint {
+    #[serde(rename = "additionalDatas")]
     pub additional_datas: Vec<AdditionalData>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct AdditionalData {
-    pub user_feedback_endpoint_product_specific_value_data:
-        UserFeedbackEndpointProductSpecificValueData,
+    #[serde(rename = "userFeedbackEndpointProductSpecificValueData")]
+    pub user_feedback_endpoint_product_specific_value_data: Param,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UserFeedbackEndpointProductSpecificValueData {
+#[derive(Serialize, Deserialize)]
+pub struct Param {
+    #[serde(rename = "key")]
     pub key: String,
+
+    #[serde(rename = "value")]
     pub value: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Accessibility10 {
-    pub accessibility_data: AccessibilityData13,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData13 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Accessibility11 {
-    pub accessibility_data: AccessibilityData14,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData14 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Accessibility12 {
-    pub accessibility_data: AccessibilityData15,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData15 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct LoggingDirectives2 {
-    pub tracking_params: String,
-    pub visibility: Visibility2,
-    pub enable_displaylogger_experiment: bool,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Visibility2 {
-    pub types: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon10 {
-    pub icon_type: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ExpandableTabRenderer {
-    pub endpoint: Endpoint3,
-    pub title: String,
-    pub selected: bool,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Endpoint3 {
+#[derive(Serialize, Deserialize)]
+pub struct ReelItemRendererNavigationEndpoint {
+    #[serde(rename = "clickTrackingParams")]
     pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata22,
-    pub browse_endpoint: BrowseEndpoint8,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: EndpointCommandMetadata,
+
+    #[serde(rename = "reelWatchEndpoint")]
+    pub reel_watch_endpoint: ReelWatchEndpoint,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata22 {
-    pub web_command_metadata: WebCommandMetadata22,
+#[derive(Serialize, Deserialize)]
+pub struct ReelWatchEndpoint {
+    #[serde(rename = "videoId")]
+    pub video_id: String,
+
+    #[serde(rename = "playerParams")]
+    pub player_params: PlayerParams,
+
+    #[serde(rename = "thumbnail")]
+    pub thumbnail: ReelWatchEndpointThumbnail,
+
+    #[serde(rename = "overlay")]
+    pub overlay: Overlay,
+
+    #[serde(rename = "params")]
+    pub params: ReelWatchEndpointParams,
+
+    #[serde(rename = "sequenceProvider")]
+    pub sequence_provider: SequenceProvider,
+
+    #[serde(rename = "sequenceParams")]
+    pub sequence_params: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata22 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-    pub api_url: String,
+#[derive(Serialize, Deserialize)]
+pub struct Overlay {
+    #[serde(rename = "reelPlayerOverlayRenderer")]
+    pub reel_player_overlay_renderer: ReelPlayerOverlayRenderer,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowseEndpoint8 {
-    pub browse_id: String,
-    pub params: String,
-    pub canonical_base_url: String,
-}
+#[derive(Serialize, Deserialize)]
+pub struct ReelPlayerOverlayRenderer {
+    #[serde(rename = "reelPlayerHeaderSupportedRenderers")]
+    pub reel_player_header_supported_renderers: ReelPlayerHeaderSupportedRenderers,
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Header {
-    #[serde(rename = "c4TabbedHeaderRenderer")]
-    pub c4tabbed_header_renderer: C4TabbedHeaderRenderer,
-}
+    #[serde(rename = "nextItemButton")]
+    pub next_item_button: ItemButton,
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct C4TabbedHeaderRenderer {
-    pub channel_id: String,
-    pub title: String,
-    pub navigation_endpoint: NavigationEndpoint15,
-    pub avatar: Avatar,
-    pub banner: Banner,
-    pub badges: Vec<Badge2>,
-    pub header_links: HeaderLinks,
-    pub subscribe_button: SubscribeButton,
-    pub subscriber_count_text: SubscriberCountText,
-    pub tv_banner: TvBanner,
-    pub mobile_banner: MobileBanner,
+    #[serde(rename = "prevItemButton")]
+    pub prev_item_button: ItemButton,
+
+    #[serde(rename = "style")]
+    pub style: ReelPlayerOverlayRendererStyle,
+
+    #[serde(rename = "trackingParams")]
     pub tracking_params: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint15 {
+#[derive(Serialize, Deserialize)]
+pub struct ItemButton {
+    #[serde(rename = "buttonRenderer")]
+    pub button_renderer: NextItemButtonButtonRenderer,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct NextItemButtonButtonRenderer {
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ReelPlayerHeaderSupportedRenderers {
+    #[serde(rename = "reelPlayerHeaderRenderer")]
+    pub reel_player_header_renderer: ReelPlayerHeaderRenderer,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ReelPlayerHeaderRenderer {
+    #[serde(rename = "reelTitleText")]
+    pub reel_title_text: ReelTitleText,
+
+    #[serde(rename = "timestampText")]
+    pub timestamp_text: ContentClass,
+
+    #[serde(rename = "channelNavigationEndpoint")]
+    pub channel_navigation_endpoint: NavigationEndpoint,
+
+    #[serde(rename = "channelTitleText")]
+    pub channel_title_text: EText,
+
+    #[serde(rename = "channelThumbnail")]
+    pub channel_thumbnail: Avatar,
+
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: String,
+
+    #[serde(rename = "accessibility")]
+    pub accessibility: HotkeyAccessibilityLabelClass,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct NavigationEndpoint {
+    #[serde(rename = "clickTrackingParams")]
     pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata23,
-    pub browse_endpoint: BrowseEndpoint9,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: EndpointCommandMetadata,
+
+    #[serde(rename = "browseEndpoint")]
+    pub browse_endpoint: ChannelNavigationEndpointBrowseEndpoint,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata23 {
-    pub web_command_metadata: WebCommandMetadata23,
+#[derive(Serialize, Deserialize)]
+pub struct ChannelNavigationEndpointBrowseEndpoint {
+    #[serde(rename = "browseId")]
+    pub browse_id: Id,
+
+    #[serde(rename = "canonicalBaseUrl")]
+    pub canonical_base_url: CanonicalBaseUrl,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata23 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-    pub api_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowseEndpoint9 {
-    pub browse_id: String,
-    pub canonical_base_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct Avatar {
-    pub thumbnails: Vec<Thumbnail13>,
+    #[serde(rename = "thumbnails")]
+    pub thumbnails: Vec<AvatarThumbnail>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail13 {
+#[derive(Serialize, Deserialize)]
+pub struct AvatarThumbnail {
+    #[serde(rename = "url")]
     pub url: String,
+
+    #[serde(rename = "width")]
     pub width: i64,
+
+    #[serde(rename = "height")]
     pub height: i64,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Banner {
-    pub thumbnails: Vec<Thumbnail14>,
+#[derive(Serialize, Deserialize)]
+pub struct EText {
+    #[serde(rename = "runs")]
+    pub runs: Vec<ShortBylineTextRun>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail14 {
-    pub url: String,
-    pub width: i64,
-    pub height: i64,
+#[derive(Serialize, Deserialize)]
+pub struct ShortBylineTextRun {
+    #[serde(rename = "text")]
+    pub text: TitleEnum,
+
+    #[serde(rename = "navigationEndpoint")]
+    pub navigation_endpoint: NavigationEndpoint,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Badge2 {
-    pub metadata_badge_renderer: MetadataBadgeRenderer4,
+#[derive(Serialize, Deserialize)]
+pub struct ReelTitleText {
+    #[serde(rename = "runs")]
+    pub runs: Vec<ReelTitleTextRun>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MetadataBadgeRenderer4 {
-    pub icon: Icon11,
-    pub style: String,
-    pub tooltip: String,
-    pub tracking_params: String,
-    pub accessibility_data: AccessibilityData16,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon11 {
-    pub icon_type: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData16 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct HeaderLinks {
-    pub channel_header_links_renderer: ChannelHeaderLinksRenderer,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ChannelHeaderLinksRenderer {
-    pub primary_links: Vec<PrimaryLink>,
-    pub secondary_links: Vec<SecondaryLink>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PrimaryLink {
-    pub navigation_endpoint: NavigationEndpoint16,
-    pub icon: Icon12,
-    pub title: Title6,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint16 {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata24,
-    pub url_endpoint: UrlEndpoint2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata24 {
-    pub web_command_metadata: WebCommandMetadata24,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata24 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UrlEndpoint2 {
-    pub url: String,
-    pub target: String,
-    pub nofollow: bool,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon12 {
-    pub thumbnails: Vec<Thumbnail15>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail15 {
-    pub url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Title6 {
-    pub simple_text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SecondaryLink {
-    pub navigation_endpoint: NavigationEndpoint17,
-    pub icon: Icon13,
-    pub title: Title7,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint17 {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata25,
-    pub url_endpoint: UrlEndpoint3,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata25 {
-    pub web_command_metadata: WebCommandMetadata25,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata25 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UrlEndpoint3 {
-    pub url: String,
-    pub target: String,
-    pub nofollow: bool,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon13 {
-    pub thumbnails: Vec<Thumbnail16>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail16 {
-    pub url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Title7 {
-    pub simple_text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SubscribeButton {
-    pub button_renderer: ButtonRenderer6,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ButtonRenderer6 {
-    pub style: String,
-    pub size: String,
-    pub is_disabled: bool,
-    pub text: Text9,
-    pub navigation_endpoint: NavigationEndpoint18,
-    pub tracking_params: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Text9 {
-    pub runs: Vec<Run23>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run23 {
+#[derive(Serialize, Deserialize)]
+pub struct ReelTitleTextRun {
+    #[serde(rename = "text")]
     pub text: String,
+
+    #[serde(rename = "navigationEndpoint")]
+    pub navigation_endpoint: Option<PurpleNavigationEndpoint>,
+
+    #[serde(rename = "loggingDirectives")]
+    pub logging_directives: Option<LoggingDirectives>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint18 {
+#[derive(Serialize, Deserialize)]
+pub struct PurpleNavigationEndpoint {
+    #[serde(rename = "clickTrackingParams")]
     pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata26,
-    pub modal_endpoint: ModalEndpoint,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata26 {
-    pub web_command_metadata: WebCommandMetadata26,
+#[derive(Serialize, Deserialize)]
+pub struct ReelWatchEndpointThumbnail {
+    #[serde(rename = "thumbnails")]
+    pub thumbnails: Vec<AvatarThumbnail>,
+
+    #[serde(rename = "isOriginalAspectRatio")]
+    pub is_original_aspect_ratio: bool,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata26 {
-    pub ignore_navigation: bool,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ModalEndpoint {
-    pub modal: Modal,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Modal {
-    pub modal_with_title_and_button_renderer: ModalWithTitleAndButtonRenderer,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ModalWithTitleAndButtonRenderer {
-    pub title: Title8,
-    pub content: Content5,
-    pub button: Button,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Title8 {
-    pub simple_text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Content5 {
-    pub simple_text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Button {
-    pub button_renderer: ButtonRenderer7,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ButtonRenderer7 {
-    pub style: String,
-    pub size: String,
-    pub is_disabled: bool,
-    pub text: Text10,
-    pub navigation_endpoint: NavigationEndpoint19,
-    pub tracking_params: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Text10 {
-    pub simple_text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint19 {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata27,
-    pub sign_in_endpoint: SignInEndpoint,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata27 {
-    pub web_command_metadata: WebCommandMetadata27,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata27 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SignInEndpoint {
-    pub next_endpoint: NextEndpoint,
-    pub continue_action: String,
-    pub idam_tag: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NextEndpoint {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata28,
-    pub browse_endpoint: BrowseEndpoint10,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata28 {
-    pub web_command_metadata: WebCommandMetadata28,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata28 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-    pub api_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowseEndpoint10 {
-    pub browse_id: String,
-    pub params: String,
-    pub canonical_base_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct SubscriberCountText {
-    pub accessibility: Accessibility13,
+    #[serde(rename = "accessibility")]
+    pub accessibility: HotkeyAccessibilityLabelClass,
+
+    #[serde(rename = "simpleText")]
     pub simple_text: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Accessibility13 {
-    pub accessibility_data: AccessibilityData17,
-}
+#[derive(Serialize, Deserialize)]
+pub struct ShelfRenderer {
+    #[serde(rename = "title")]
+    pub title: TentacledTitle,
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData17 {
-    pub label: String,
-}
+    #[serde(rename = "endpoint")]
+    pub endpoint: NextEndpointClass,
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct TvBanner {
-    pub thumbnails: Vec<Thumbnail17>,
-}
+    #[serde(rename = "content")]
+    pub content: ShelfRendererContent,
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail17 {
-    pub url: String,
-    pub width: i64,
-    pub height: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MobileBanner {
-    pub thumbnails: Vec<Thumbnail18>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail18 {
-    pub url: String,
-    pub width: i64,
-    pub height: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Metadata {
-    pub channel_metadata_renderer: ChannelMetadataRenderer,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ChannelMetadataRenderer {
-    pub title: String,
-    pub description: String,
-    pub rss_url: String,
-    pub external_id: String,
-    pub keywords: String,
-    pub owner_urls: Vec<String>,
-    pub avatar: Avatar2,
-    pub channel_url: String,
-    pub is_family_safe: bool,
-    pub available_country_codes: Vec<String>,
-    pub android_deep_link: String,
-    pub android_appindexing_link: String,
-    pub ios_appindexing_link: String,
-    pub vanity_channel_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Avatar2 {
-    pub thumbnails: Vec<Thumbnail19>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail19 {
-    pub url: String,
-    pub width: i64,
-    pub height: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Topbar {
-    pub desktop_topbar_renderer: DesktopTopbarRenderer,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DesktopTopbarRenderer {
-    pub logo: Logo,
-    pub searchbox: Searchbox,
+    #[serde(rename = "trackingParams")]
     pub tracking_params: String,
-    pub topbar_buttons: Vec<TopbarButton>,
-    pub hotkey_dialog: HotkeyDialog,
-    pub back_button: BackButton,
-    pub forward_button: ForwardButton,
-    pub a11y_skip_navigation_button: A11ySkipNavigationButton,
-    pub voice_search_button: VoiceSearchButton,
+
+    #[serde(rename = "playAllButton")]
+    pub play_all_button: Option<PlayAllButton>,
+
+    #[serde(rename = "subtitle")]
+    pub subtitle: Option<ContentClass>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Logo {
-    pub topbar_logo_renderer: TopbarLogoRenderer,
+#[derive(Serialize, Deserialize)]
+pub struct ShelfRendererContent {
+    #[serde(rename = "horizontalListRenderer")]
+    pub horizontal_list_renderer: HorizontalListRenderer,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct TopbarLogoRenderer {
-    pub icon_image: IconImage,
-    pub tooltip_text: TooltipText,
-    pub endpoint: Endpoint4,
+#[derive(Serialize, Deserialize)]
+pub struct HorizontalListRenderer {
+    #[serde(rename = "items")]
+    pub items: Vec<HorizontalListRendererItem>,
+
+    #[serde(rename = "trackingParams")]
     pub tracking_params: String,
-    pub override_entity_key: String,
+
+    #[serde(rename = "visibleItemCount")]
+    pub visible_item_count: i64,
+
+    #[serde(rename = "nextButton")]
+    pub next_button: VoiceSearchButtonClass,
+
+    #[serde(rename = "previousButton")]
+    pub previous_button: VoiceSearchButtonClass,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct IconImage {
-    pub icon_type: String,
+#[derive(Serialize, Deserialize)]
+pub struct HorizontalListRendererItem {
+    #[serde(rename = "gridVideoRenderer")]
+    pub grid_video_renderer: Option<GridVideoRenderer>,
+
+    #[serde(rename = "gridPlaylistRenderer")]
+    pub grid_playlist_renderer: Option<GridPlaylistRenderer>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct TooltipText {
-    pub runs: Vec<Run24>,
+#[derive(Serialize, Deserialize)]
+pub struct GridPlaylistRenderer {
+    #[serde(rename = "playlistId")]
+    pub playlist_id: String,
+
+    #[serde(rename = "thumbnail")]
+    pub thumbnail: Avatar,
+
+    #[serde(rename = "title")]
+    pub title: FluffyTitle,
+
+    #[serde(rename = "videoCountText")]
+    pub video_count_text: TextClass,
+
+    #[serde(rename = "navigationEndpoint")]
+    pub navigation_endpoint: GridPlaylistRendererNavigationEndpoint,
+
+    #[serde(rename = "videoCountShortText")]
+    pub video_count_short_text: ContentClass,
+
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: String,
+
+    #[serde(rename = "sidebarThumbnails")]
+    pub sidebar_thumbnails: Vec<Avatar>,
+
+    #[serde(rename = "thumbnailText")]
+    pub thumbnail_text: ThumbnailText,
+
+    #[serde(rename = "ownerBadges")]
+    pub owner_badges: Vec<OwnerBadgeElement>,
+
+    #[serde(rename = "thumbnailRenderer")]
+    pub thumbnail_renderer: ThumbnailRenderer,
+
+    #[serde(rename = "thumbnailOverlays")]
+    pub thumbnail_overlays: Vec<GridPlaylistRendererThumbnailOverlay>,
+
+    #[serde(rename = "viewPlaylistText")]
+    pub view_playlist_text: ViewPlaylistText,
+
+    #[serde(rename = "publishedTimeText")]
+    pub published_time_text: Option<ContentClass>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run24 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Endpoint4 {
+#[derive(Serialize, Deserialize)]
+pub struct GridPlaylistRendererNavigationEndpoint {
+    #[serde(rename = "clickTrackingParams")]
     pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata29,
-    pub browse_endpoint: BrowseEndpoint11,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: EndpointCommandMetadata,
+
+    #[serde(rename = "watchEndpoint")]
+    pub watch_endpoint: TentacledWatchEndpoint,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata29 {
-    pub web_command_metadata: WebCommandMetadata29,
+#[derive(Serialize, Deserialize)]
+pub struct TentacledWatchEndpoint {
+    #[serde(rename = "videoId")]
+    pub video_id: String,
+
+    #[serde(rename = "playlistId")]
+    pub playlist_id: String,
+
+    #[serde(rename = "params")]
+    pub params: Option<WatchEndpointParams>,
+
+    #[serde(rename = "loggingContext")]
+    pub logging_context: LoggingContext,
+
+    #[serde(rename = "watchEndpointSupportedOnesieConfig")]
+    pub watch_endpoint_supported_onesie_config: WatchEndpointSupportedOnesieConfig,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata29 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-    pub api_url: String,
+#[derive(Serialize, Deserialize)]
+pub struct LoggingContext {
+    #[serde(rename = "vssLoggingContext")]
+    pub vss_logging_context: VssLoggingContext,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowseEndpoint11 {
+#[derive(Serialize, Deserialize)]
+pub struct VssLoggingContext {
+    #[serde(rename = "serializedContextData")]
+    pub serialized_context_data: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct OwnerBadgeElement {
+    #[serde(rename = "metadataBadgeRenderer")]
+    pub metadata_badge_renderer: OwnerBadgeMetadataBadgeRenderer,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct OwnerBadgeMetadataBadgeRenderer {
+    #[serde(rename = "icon")]
+    pub icon: IconImage,
+
+    #[serde(rename = "style")]
+    pub style: MetadataBadgeRendererStyle,
+
+    #[serde(rename = "tooltip")]
+    pub tooltip: Tooltip,
+
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: String,
+
+    #[serde(rename = "accessibilityData")]
+    pub accessibility_data: AccessibilityAccessibilityData,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct GridPlaylistRendererThumbnailOverlay {
+    #[serde(rename = "thumbnailOverlaySidePanelRenderer")]
+    pub thumbnail_overlay_side_panel_renderer: Option<ThumbnailOverlaySidePanelRenderer>,
+
+    #[serde(rename = "thumbnailOverlayHoverTextRenderer")]
+    pub thumbnail_overlay_hover_text_renderer: Option<ThumbnailOverlayHoverTextRenderer>,
+
+    #[serde(rename = "thumbnailOverlayNowPlayingRenderer")]
+    pub thumbnail_overlay_now_playing_renderer: Option<ThumbnailOverlayNowPlayingRenderer>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ThumbnailOverlayHoverTextRenderer {
+    #[serde(rename = "text")]
+    pub text: TextClass,
+
+    #[serde(rename = "icon")]
+    pub icon: IconImage,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ThumbnailOverlayNowPlayingRenderer {
+    #[serde(rename = "text")]
+    pub text: TextClass,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ThumbnailOverlaySidePanelRenderer {
+    #[serde(rename = "text")]
+    pub text: ContentClass,
+
+    #[serde(rename = "icon")]
+    pub icon: IconImage,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ThumbnailRenderer {
+    #[serde(rename = "playlistVideoThumbnailRenderer")]
+    pub playlist_video_thumbnail_renderer: PlaylistVideoThumbnailRenderer,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct PlaylistVideoThumbnailRenderer {
+    #[serde(rename = "thumbnail")]
+    pub thumbnail: Avatar,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ThumbnailText {
+    #[serde(rename = "runs")]
+    pub runs: Vec<ThumbnailTextRun>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ThumbnailTextRun {
+    #[serde(rename = "text")]
+    pub text: String,
+
+    #[serde(rename = "bold")]
+    pub bold: Option<bool>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct FluffyTitle {
+    #[serde(rename = "runs")]
+    pub runs: Vec<PurpleRun>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct PurpleRun {
+    #[serde(rename = "text")]
+    pub text: String,
+
+    #[serde(rename = "navigationEndpoint")]
+    pub navigation_endpoint: GridPlaylistRendererNavigationEndpoint,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ViewPlaylistText {
+    #[serde(rename = "runs")]
+    pub runs: Vec<ViewPlaylistTextRun>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ViewPlaylistTextRun {
+    #[serde(rename = "text")]
+    pub text: TextEnum,
+
+    #[serde(rename = "navigationEndpoint")]
+    pub navigation_endpoint: TopbarLogoRendererEndpoint,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct TopbarLogoRendererEndpoint {
+    #[serde(rename = "clickTrackingParams")]
+    pub click_tracking_params: String,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: EndpointCommandMetadata,
+
+    #[serde(rename = "browseEndpoint")]
+    pub browse_endpoint: PurpleBrowseEndpoint,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct PurpleBrowseEndpoint {
+    #[serde(rename = "browseId")]
     pub browse_id: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Searchbox {
-    pub fusion_searchbox_renderer: FusionSearchboxRenderer,
-}
+#[derive(Serialize, Deserialize)]
+pub struct GridVideoRenderer {
+    #[serde(rename = "videoId")]
+    pub video_id: String,
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct FusionSearchboxRenderer {
-    pub icon: Icon14,
-    pub placeholder_text: PlaceholderText,
-    pub config: Config,
+    #[serde(rename = "thumbnail")]
+    pub thumbnail: Avatar,
+
+    #[serde(rename = "title")]
+    pub title: SubscriberCountText,
+
+    #[serde(rename = "viewCountText")]
+    pub view_count_text: Option<ViewCountText>,
+
+    #[serde(rename = "navigationEndpoint")]
+    pub navigation_endpoint: GridVideoRendererNavigationEndpoint,
+
+    #[serde(rename = "upcomingEventData")]
+    pub upcoming_event_data: Option<UpcomingEventData>,
+
+    #[serde(rename = "ownerBadges")]
+    pub owner_badges: Vec<OwnerBadgeElement>,
+
+    #[serde(rename = "trackingParams")]
     pub tracking_params: String,
-    pub search_endpoint: SearchEndpoint,
-    pub clear_button: ClearButton,
+
+    #[serde(rename = "shortViewCountText")]
+    pub short_view_count_text: Option<ShortViewCountText>,
+
+    #[serde(rename = "menu")]
+    pub menu: GridVideoRendererMenu,
+
+    #[serde(rename = "thumbnailOverlays")]
+    pub thumbnail_overlays: Vec<GridVideoRendererThumbnailOverlay>,
+
+    #[serde(rename = "publishedTimeText")]
+    pub published_time_text: Option<ContentClass>,
+
+    #[serde(rename = "badges")]
+    pub badges: Option<Vec<PurpleBadge>>,
+
+    #[serde(rename = "shortBylineText")]
+    pub short_byline_text: Option<EText>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon14 {
-    pub icon_type: String,
+#[derive(Serialize, Deserialize)]
+pub struct PurpleBadge {
+    #[serde(rename = "metadataBadgeRenderer")]
+    pub metadata_badge_renderer: PurpleMetadataBadgeRenderer,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PlaceholderText {
-    pub runs: Vec<Run25>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run25 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Config {
-    pub web_searchbox_config: WebSearchboxConfig,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebSearchboxConfig {
-    pub request_language: String,
-    pub request_domain: String,
-    pub has_onscreen_keyboard: bool,
-    pub focus_searchbox: bool,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchEndpoint {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata30,
-    pub search_endpoint: SearchEndpoint2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata30 {
-    pub web_command_metadata: WebCommandMetadata30,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata30 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchEndpoint2 {
-    pub query: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ClearButton {
-    pub button_renderer: ButtonRenderer8,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ButtonRenderer8 {
+#[derive(Serialize, Deserialize)]
+pub struct PurpleMetadataBadgeRenderer {
+    #[serde(rename = "style")]
     pub style: String,
-    pub size: String,
-    pub is_disabled: bool,
-    pub icon: Icon15,
-    pub tracking_params: String,
-    pub accessibility_data: AccessibilityData18,
-}
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon15 {
-    pub icon_type: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData18 {
-    pub accessibility_data: AccessibilityData19,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData19 {
+    #[serde(rename = "label")]
     pub label: String,
-}
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct TopbarButton {
-    pub topbar_menu_button_renderer: Option<TopbarMenuButtonRenderer>,
-    pub button_renderer: Option<ButtonRenderer9>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct TopbarMenuButtonRenderer {
-    pub icon: Icon16,
-    pub menu_request: MenuRequest,
+    #[serde(rename = "trackingParams")]
     pub tracking_params: String,
-    pub accessibility: Accessibility14,
-    pub tooltip: String,
-    pub style: String,
+
+    #[serde(rename = "accessibilityData")]
+    pub accessibility_data: AccessibilityAccessibilityData,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon16 {
-    pub icon_type: String,
+#[derive(Serialize, Deserialize)]
+pub struct GridVideoRendererMenu {
+    #[serde(rename = "menuRenderer")]
+    pub menu_renderer: FluffyMenuRenderer,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MenuRequest {
+#[derive(Serialize, Deserialize)]
+pub struct FluffyMenuRenderer {
+    #[serde(rename = "items")]
+    pub items: Vec<FluffyItem>,
+
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: String,
+
+    #[serde(rename = "accessibility")]
+    pub accessibility: HotkeyAccessibilityLabelClass,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct FluffyItem {
+    #[serde(rename = "menuServiceItemRenderer")]
+    pub menu_service_item_renderer: MenuServiceItemRenderer,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct MenuServiceItemRenderer {
+    #[serde(rename = "text")]
+    pub text: TextClass,
+
+    #[serde(rename = "icon")]
+    pub icon: IconImage,
+
+    #[serde(rename = "serviceEndpoint")]
+    pub service_endpoint: MenuServiceItemRendererServiceEndpoint,
+
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct MenuServiceItemRendererServiceEndpoint {
+    #[serde(rename = "clickTrackingParams")]
     pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata31,
-    pub signal_service_endpoint: SignalServiceEndpoint3,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: ServiceEndpointCommandMetadata,
+
+    #[serde(rename = "signalServiceEndpoint")]
+    pub signal_service_endpoint: UntoggledServiceEndpointSignalServiceEndpoint,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata31 {
-    pub web_command_metadata: WebCommandMetadata31,
+#[derive(Serialize, Deserialize)]
+pub struct ServiceEndpointCommandMetadata {
+    #[serde(rename = "webCommandMetadata")]
+    pub web_command_metadata: TentacledWebCommandMetadata,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata31 {
-    pub send_post: bool,
-    pub api_url: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SignalServiceEndpoint3 {
-    pub signal: String,
-    pub actions: Vec<Action5>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Action5 {
-    pub click_tracking_params: String,
-    pub open_popup_action: OpenPopupAction,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct OpenPopupAction {
-    pub popup: Popup,
-    pub popup_type: String,
-    pub be_reused: bool,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Popup {
-    pub multi_page_menu_renderer: MultiPageMenuRenderer,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MultiPageMenuRenderer {
-    pub tracking_params: String,
-    pub style: String,
-    pub show_loading_spinner: bool,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Accessibility14 {
-    pub accessibility_data: AccessibilityData20,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData20 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ButtonRenderer9 {
-    pub style: String,
-    pub size: String,
-    pub text: Text11,
-    pub icon: Icon17,
-    pub navigation_endpoint: NavigationEndpoint20,
-    pub tracking_params: String,
-    pub target_id: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Text11 {
-    pub runs: Vec<Run26>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run26 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon17 {
-    pub icon_type: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint20 {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata32,
-    pub sign_in_endpoint: SignInEndpoint2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata32 {
-    pub web_command_metadata: WebCommandMetadata32,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata32 {
-    pub url: String,
-    pub web_page_type: String,
-    pub root_ve: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SignInEndpoint2 {
-    pub idam_tag: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct HotkeyDialog {
-    pub hotkey_dialog_renderer: HotkeyDialogRenderer,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct HotkeyDialogRenderer {
-    pub title: Title9,
-    pub sections: Vec<Section>,
-    pub dismiss_button: DismissButton,
-    pub tracking_params: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Title9 {
-    pub runs: Vec<Run27>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run27 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Section {
-    pub hotkey_dialog_section_renderer: HotkeyDialogSectionRenderer,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct HotkeyDialogSectionRenderer {
-    pub title: Title10,
-    pub options: Vec<Option>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Title10 {
-    pub runs: Vec<Run28>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run28 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Option {
-    pub hotkey_dialog_section_option_renderer: HotkeyDialogSectionOptionRenderer,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct HotkeyDialogSectionOptionRenderer {
-    pub label: Label,
-    pub hotkey: String,
-    pub hotkey_accessibility_label: Option<HotkeyAccessibilityLabel>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Label {
-    pub runs: Vec<Run29>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run29 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct HotkeyAccessibilityLabel {
-    pub accessibility_data: AccessibilityData21,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData21 {
-    pub label: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DismissButton {
-    pub button_renderer: ButtonRenderer10,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ButtonRenderer10 {
-    pub style: String,
-    pub size: String,
-    pub is_disabled: bool,
-    pub text: Text12,
-    pub tracking_params: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Text12 {
-    pub runs: Vec<Run30>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run30 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BackButton {
-    pub button_renderer: ButtonRenderer11,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ButtonRenderer11 {
-    pub tracking_params: String,
-    pub command: Command,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Command {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata33,
-    pub signal_service_endpoint: SignalServiceEndpoint4,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata33 {
-    pub web_command_metadata: WebCommandMetadata33,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata33 {
+#[derive(Serialize, Deserialize)]
+pub struct TentacledWebCommandMetadata {
+    #[serde(rename = "sendPost")]
     pub send_post: bool,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SignalServiceEndpoint4 {
-    pub signal: String,
-    pub actions: Vec<Action6>,
+#[derive(Serialize, Deserialize)]
+pub struct UntoggledServiceEndpointSignalServiceEndpoint {
+    #[serde(rename = "signal")]
+    pub signal: Signal,
+
+    #[serde(rename = "actions")]
+    pub actions: Vec<PurpleAction>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Action6 {
+#[derive(Serialize, Deserialize)]
+pub struct PurpleAction {
+    #[serde(rename = "clickTrackingParams")]
     pub click_tracking_params: String,
-    pub signal_action: SignalAction,
+
+    #[serde(rename = "addToPlaylistCommand")]
+    pub add_to_playlist_command: AddToPlaylistCommand,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SignalAction {
-    pub signal: String,
+#[derive(Serialize, Deserialize)]
+pub struct AddToPlaylistCommand {
+    #[serde(rename = "openMiniplayer")]
+    pub open_miniplayer: bool,
+
+    #[serde(rename = "videoId")]
+    pub video_id: String,
+
+    #[serde(rename = "listType")]
+    pub list_type: ListType,
+
+    #[serde(rename = "onCreateListCommand")]
+    pub on_create_list_command: OnCreateListCommand,
+
+    #[serde(rename = "videoIds")]
+    pub video_ids: Vec<String>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ForwardButton {
-    pub button_renderer: ButtonRenderer12,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ButtonRenderer12 {
-    pub tracking_params: String,
-    pub command: Command2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Command2 {
+#[derive(Serialize, Deserialize)]
+pub struct OnCreateListCommand {
+    #[serde(rename = "clickTrackingParams")]
     pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata34,
-    pub signal_service_endpoint: SignalServiceEndpoint5,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: OnCreateListCommandCommandMetadata,
+
+    #[serde(rename = "createPlaylistServiceEndpoint")]
+    pub create_playlist_service_endpoint: CreatePlaylistServiceEndpoint,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata34 {
-    pub web_command_metadata: WebCommandMetadata34,
+#[derive(Serialize, Deserialize)]
+pub struct OnCreateListCommandCommandMetadata {
+    #[serde(rename = "webCommandMetadata")]
+    pub web_command_metadata: StickyWebCommandMetadata,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata34 {
+#[derive(Serialize, Deserialize)]
+pub struct StickyWebCommandMetadata {
+    #[serde(rename = "sendPost")]
     pub send_post: bool,
+
+    #[serde(rename = "apiUrl")]
+    pub api_url: Option<FluffyApiUrl>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SignalServiceEndpoint5 {
-    pub signal: String,
-    pub actions: Vec<Action7>,
+#[derive(Serialize, Deserialize)]
+pub struct CreatePlaylistServiceEndpoint {
+    #[serde(rename = "videoIds")]
+    pub video_ids: Vec<String>,
+
+    #[serde(rename = "params")]
+    pub params: CreatePlaylistServiceEndpointParams,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Action7 {
-    pub click_tracking_params: String,
-    pub signal_action: SignalAction2,
+#[derive(Serialize, Deserialize)]
+pub struct ShortViewCountText {
+    #[serde(rename = "runs")]
+    pub runs: Option<Vec<TextRun>>,
+
+    #[serde(rename = "accessibility")]
+    pub accessibility: Option<HotkeyAccessibilityLabelClass>,
+
+    #[serde(rename = "simpleText")]
+    pub simple_text: Option<String>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SignalAction2 {
-    pub signal: String,
+#[derive(Serialize, Deserialize)]
+pub struct GridVideoRendererThumbnailOverlay {
+    #[serde(rename = "thumbnailOverlayTimeStatusRenderer")]
+    pub thumbnail_overlay_time_status_renderer: Option<ThumbnailOverlayTimeStatusRenderer>,
+
+    #[serde(rename = "thumbnailOverlayToggleButtonRenderer")]
+    pub thumbnail_overlay_toggle_button_renderer: Option<ThumbnailOverlayToggleButtonRenderer>,
+
+    #[serde(rename = "thumbnailOverlayNowPlayingRenderer")]
+    pub thumbnail_overlay_now_playing_renderer: Option<ThumbnailOverlayNowPlayingRenderer>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct A11ySkipNavigationButton {
-    pub button_renderer: ButtonRenderer13,
+#[derive(Serialize, Deserialize)]
+pub struct ThumbnailOverlayTimeStatusRenderer {
+    #[serde(rename = "text")]
+    pub text: SubscriberCountText,
+
+    #[serde(rename = "style")]
+    pub style: ThumbnailOverlayTimeStatusRendererStyle,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ButtonRenderer13 {
-    pub style: String,
-    pub size: String,
-    pub is_disabled: bool,
-    pub text: Text13,
+#[derive(Serialize, Deserialize)]
+pub struct ThumbnailOverlayToggleButtonRenderer {
+    #[serde(rename = "isToggled")]
+    pub is_toggled: Option<bool>,
+
+    #[serde(rename = "untoggledIcon")]
+    pub untoggled_icon: IconImage,
+
+    #[serde(rename = "toggledIcon")]
+    pub toggled_icon: IconImage,
+
+    #[serde(rename = "untoggledTooltip")]
+    pub untoggled_tooltip: UntoggledTooltip,
+
+    #[serde(rename = "toggledTooltip")]
+    pub toggled_tooltip: ToggledTooltip,
+
+    #[serde(rename = "untoggledServiceEndpoint")]
+    pub untoggled_service_endpoint: UntoggledServiceEndpoint,
+
+    #[serde(rename = "toggledServiceEndpoint")]
+    pub toggled_service_endpoint: Option<ToggledServiceEndpoint>,
+
+    #[serde(rename = "untoggledAccessibility")]
+    pub untoggled_accessibility: HotkeyAccessibilityLabelClass,
+
+    #[serde(rename = "toggledAccessibility")]
+    pub toggled_accessibility: HotkeyAccessibilityLabelClass,
+
+    #[serde(rename = "trackingParams")]
     pub tracking_params: String,
-    pub command: Command3,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Text13 {
-    pub runs: Vec<Run31>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run31 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Command3 {
+#[derive(Serialize, Deserialize)]
+pub struct ToggledServiceEndpoint {
+    #[serde(rename = "clickTrackingParams")]
     pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata35,
-    pub signal_service_endpoint: SignalServiceEndpoint6,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: OnCreateListCommandCommandMetadata,
+
+    #[serde(rename = "playlistEditEndpoint")]
+    pub playlist_edit_endpoint: ToggledServiceEndpointPlaylistEditEndpoint,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata35 {
-    pub web_command_metadata: WebCommandMetadata35,
+#[derive(Serialize, Deserialize)]
+pub struct ToggledServiceEndpointPlaylistEditEndpoint {
+    #[serde(rename = "playlistId")]
+    pub playlist_id: PlaylistId,
+
+    #[serde(rename = "actions")]
+    pub actions: Vec<FluffyAction>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata35 {
-    pub send_post: bool,
+#[derive(Serialize, Deserialize)]
+pub struct FluffyAction {
+    #[serde(rename = "action")]
+    pub action: HilariousAction,
+
+    #[serde(rename = "removedVideoId")]
+    pub removed_video_id: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SignalServiceEndpoint6 {
-    pub signal: String,
-    pub actions: Vec<Action8>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Action8 {
+#[derive(Serialize, Deserialize)]
+pub struct UntoggledServiceEndpoint {
+    #[serde(rename = "clickTrackingParams")]
     pub click_tracking_params: String,
-    pub signal_action: SignalAction3,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: OnCreateListCommandCommandMetadata,
+
+    #[serde(rename = "playlistEditEndpoint")]
+    pub playlist_edit_endpoint: Option<UntoggledServiceEndpointPlaylistEditEndpoint>,
+
+    #[serde(rename = "signalServiceEndpoint")]
+    pub signal_service_endpoint: Option<UntoggledServiceEndpointSignalServiceEndpoint>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SignalAction3 {
-    pub signal: String,
+#[derive(Serialize, Deserialize)]
+pub struct UntoggledServiceEndpointPlaylistEditEndpoint {
+    #[serde(rename = "playlistId")]
+    pub playlist_id: PlaylistId,
+
+    #[serde(rename = "actions")]
+    pub actions: Vec<TentacledAction>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct VoiceSearchButton {
-    pub button_renderer: ButtonRenderer14,
+#[derive(Serialize, Deserialize)]
+pub struct TentacledAction {
+    #[serde(rename = "addedVideoId")]
+    pub added_video_id: String,
+
+    #[serde(rename = "action")]
+    pub action: AmbitiousAction,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ButtonRenderer14 {
-    pub style: String,
-    pub size: String,
-    pub is_disabled: bool,
-    pub service_endpoint: ServiceEndpoint2,
-    pub icon: Icon19,
-    pub tooltip: String,
+#[derive(Serialize, Deserialize)]
+pub struct UpcomingEventData {
+    #[serde(rename = "startTime")]
+    pub start_time: String,
+
+    #[serde(rename = "isReminderSet")]
+    pub is_reminder_set: bool,
+
+    #[serde(rename = "upcomingEventText")]
+    pub upcoming_event_text: TextClass,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ViewCountText {
+    #[serde(rename = "runs")]
+    pub runs: Option<Vec<TextRun>>,
+
+    #[serde(rename = "simpleText")]
+    pub simple_text: Option<String>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct VoiceSearchDialogRenderer {
+    #[serde(rename = "placeholderHeader")]
+    pub placeholder_header: TextClass,
+
+    #[serde(rename = "promptHeader")]
+    pub prompt_header: TextClass,
+
+    #[serde(rename = "exampleQuery1")]
+    pub example_query1: TextClass,
+
+    #[serde(rename = "exampleQuery2")]
+    pub example_query2: TextClass,
+
+    #[serde(rename = "promptMicrophoneLabel")]
+    pub prompt_microphone_label: TextClass,
+
+    #[serde(rename = "loadingHeader")]
+    pub loading_header: TextClass,
+
+    #[serde(rename = "connectionErrorHeader")]
+    pub connection_error_header: TextClass,
+
+    #[serde(rename = "connectionErrorMicrophoneLabel")]
+    pub connection_error_microphone_label: TextClass,
+
+    #[serde(rename = "permissionsHeader")]
+    pub permissions_header: TextClass,
+
+    #[serde(rename = "permissionsSubtext")]
+    pub permissions_subtext: TextClass,
+
+    #[serde(rename = "disabledHeader")]
+    pub disabled_header: TextClass,
+
+    #[serde(rename = "disabledSubtext")]
+    pub disabled_subtext: TextClass,
+
+    #[serde(rename = "microphoneButtonAriaLabel")]
+    pub microphone_button_aria_label: TextClass,
+
+    #[serde(rename = "exitButton")]
+    pub exit_button: VoiceSearchButtonClass,
+
+    #[serde(rename = "trackingParams")]
     pub tracking_params: String,
-    pub accessibility_data: AccessibilityData24,
+
+    #[serde(rename = "microphoneOffPromptHeader")]
+    pub microphone_off_prompt_header: TextClass,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ServiceEndpoint2 {
-    pub click_tracking_params: String,
-    pub command_metadata: CommandMetadata36,
-    pub signal_service_endpoint: SignalServiceEndpoint7,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CommandMetadata36 {
-    pub web_command_metadata: WebCommandMetadata36,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebCommandMetadata36 {
-    pub send_post: bool,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SignalServiceEndpoint7 {
-    pub signal: String,
-    pub actions: Vec<Action9>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Action9 {
-    pub click_tracking_params: String,
-    pub open_popup_action: OpenPopupAction2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct OpenPopupAction2 {
-    pub popup: Popup2,
-    pub popup_type: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Popup2 {
+#[derive(Serialize, Deserialize)]
+pub struct PurplePopup {
+    #[serde(rename = "voiceSearchDialogRenderer")]
     pub voice_search_dialog_renderer: VoiceSearchDialogRenderer,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct VoiceSearchDialogRenderer {
-    pub placeholder_header: PlaceholderHeader,
-    pub prompt_header: PromptHeader,
-    pub example_query1: ExampleQuery1,
-    pub example_query2: ExampleQuery2,
-    pub prompt_microphone_label: PromptMicrophoneLabel,
-    pub loading_header: LoadingHeader,
-    pub connection_error_header: ConnectionErrorHeader,
-    pub connection_error_microphone_label: ConnectionErrorMicrophoneLabel,
-    pub permissions_header: PermissionsHeader,
-    pub permissions_subtext: PermissionsSubtext,
-    pub disabled_header: DisabledHeader,
-    pub disabled_subtext: DisabledSubtext,
-    pub microphone_button_aria_label: MicrophoneButtonAriaLabel,
-    pub exit_button: ExitButton,
-    pub tracking_params: String,
-    pub microphone_off_prompt_header: MicrophoneOffPromptHeader,
+#[derive(Serialize, Deserialize)]
+pub struct PurpleOpenPopupAction {
+    #[serde(rename = "popup")]
+    pub popup: PurplePopup,
+
+    #[serde(rename = "popupType")]
+    pub popup_type: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PlaceholderHeader {
-    pub runs: Vec<Run32>,
+#[derive(Serialize, Deserialize)]
+pub struct StickyAction {
+    #[serde(rename = "clickTrackingParams")]
+    pub click_tracking_params: String,
+
+    #[serde(rename = "openPopupAction")]
+    pub open_popup_action: PurpleOpenPopupAction,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run32 {
-    pub text: String,
+#[derive(Serialize, Deserialize)]
+pub struct PurpleSignalServiceEndpoint {
+    #[serde(rename = "signal")]
+    pub signal: Signal,
+
+    #[serde(rename = "actions")]
+    pub actions: Vec<StickyAction>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PromptHeader {
-    pub runs: Vec<Run33>,
+#[derive(Serialize, Deserialize)]
+pub struct ButtonRendererServiceEndpoint {
+    #[serde(rename = "clickTrackingParams")]
+    pub click_tracking_params: String,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: ServiceEndpointCommandMetadata,
+
+    #[serde(rename = "signalServiceEndpoint")]
+    pub signal_service_endpoint: PurpleSignalServiceEndpoint,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run33 {
-    pub text: String,
-}
+#[derive(Serialize, Deserialize)]
+pub struct VoiceSearchButtonButtonRenderer {
+    #[serde(rename = "style")]
+    pub style: ButtonRendererStyle,
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ExampleQuery1 {
-    pub runs: Vec<Run34>,
-}
+    #[serde(rename = "size")]
+    pub size: Size,
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run34 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ExampleQuery2 {
-    pub runs: Vec<Run35>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run35 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PromptMicrophoneLabel {
-    pub runs: Vec<Run36>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run36 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct LoadingHeader {
-    pub runs: Vec<Run37>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run37 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ConnectionErrorHeader {
-    pub runs: Vec<Run38>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run38 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ConnectionErrorMicrophoneLabel {
-    pub runs: Vec<Run39>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run39 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PermissionsHeader {
-    pub runs: Vec<Run40>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run40 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PermissionsSubtext {
-    pub runs: Vec<Run41>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run41 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DisabledHeader {
-    pub runs: Vec<Run42>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run42 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DisabledSubtext {
-    pub runs: Vec<Run43>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run43 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MicrophoneButtonAriaLabel {
-    pub runs: Vec<Run44>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run44 {
-    pub text: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ExitButton {
-    pub button_renderer: ButtonRenderer15,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ButtonRenderer15 {
-    pub style: String,
-    pub size: String,
+    #[serde(rename = "isDisabled")]
     pub is_disabled: bool,
-    pub icon: Icon18,
+
+    #[serde(rename = "icon")]
+    pub icon: IconImage,
+
+    #[serde(rename = "accessibility")]
+    pub accessibility: Option<AccessibilityAccessibilityData>,
+
+    #[serde(rename = "trackingParams")]
     pub tracking_params: String,
-    pub accessibility_data: AccessibilityData22,
+
+    #[serde(rename = "accessibilityData")]
+    pub accessibility_data: Option<HotkeyAccessibilityLabelClass>,
+
+    #[serde(rename = "serviceEndpoint")]
+    pub service_endpoint: Option<ButtonRendererServiceEndpoint>,
+
+    #[serde(rename = "tooltip")]
+    pub tooltip: Option<String>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon18 {
-    pub icon_type: String,
+#[derive(Serialize, Deserialize)]
+pub struct VoiceSearchButtonClass {
+    #[serde(rename = "buttonRenderer")]
+    pub button_renderer: VoiceSearchButtonButtonRenderer,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData22 {
-    pub accessibility_data: AccessibilityData23,
+#[derive(Serialize, Deserialize)]
+pub struct PlayAllButton {
+    #[serde(rename = "buttonRenderer")]
+    pub button_renderer: PlayAllButtonButtonRenderer,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData23 {
-    pub label: String,
+#[derive(Serialize, Deserialize)]
+pub struct PlayAllButtonButtonRenderer {
+    #[serde(rename = "style")]
+    pub style: String,
+
+    #[serde(rename = "size")]
+    pub size: Size,
+
+    #[serde(rename = "isDisabled")]
+    pub is_disabled: bool,
+
+    #[serde(rename = "text")]
+    pub text: TextClass,
+
+    #[serde(rename = "icon")]
+    pub icon: IconImage,
+
+    #[serde(rename = "navigationEndpoint")]
+    pub navigation_endpoint: GridPlaylistRendererNavigationEndpoint,
+
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MicrophoneOffPromptHeader {
-    pub runs: Vec<Run45>,
+#[derive(Serialize, Deserialize)]
+pub struct TentacledTitle {
+    #[serde(rename = "runs")]
+    pub runs: Vec<FluffyRun>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Run45 {
+#[derive(Serialize, Deserialize)]
+pub struct FluffyRun {
+    #[serde(rename = "text")]
     pub text: String,
+
+    #[serde(rename = "navigationEndpoint")]
+    pub navigation_endpoint: NextEndpointClass,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Icon19 {
-    pub icon_type: String,
+#[derive(Serialize, Deserialize)]
+pub struct Header {
+    #[serde(rename = "c4TabbedHeaderRenderer")]
+    pub c4_tabbed_header_renderer: C4TabbedHeaderRenderer,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData24 {
-    pub accessibility_data: AccessibilityData25,
+#[derive(Serialize, Deserialize)]
+pub struct C4TabbedHeaderRenderer {
+    #[serde(rename = "channelId")]
+    pub channel_id: Id,
+
+    #[serde(rename = "title")]
+    pub title: TitleEnum,
+
+    #[serde(rename = "navigationEndpoint")]
+    pub navigation_endpoint: NavigationEndpoint,
+
+    #[serde(rename = "avatar")]
+    pub avatar: Avatar,
+
+    #[serde(rename = "banner")]
+    pub banner: Avatar,
+
+    #[serde(rename = "badges")]
+    pub badges: Vec<OwnerBadgeElement>,
+
+    #[serde(rename = "headerLinks")]
+    pub header_links: HeaderLinks,
+
+    #[serde(rename = "subscribeButton")]
+    pub subscribe_button: SubscribeButtonClass,
+
+    #[serde(rename = "subscriberCountText")]
+    pub subscriber_count_text: SubscriberCountText,
+
+    #[serde(rename = "tvBanner")]
+    pub tv_banner: Avatar,
+
+    #[serde(rename = "mobileBanner")]
+    pub mobile_banner: Avatar,
+
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: TrackingParams,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessibilityData25 {
-    pub label: String,
+#[derive(Serialize, Deserialize)]
+pub struct HeaderLinks {
+    #[serde(rename = "channelHeaderLinksRenderer")]
+    pub channel_header_links_renderer: ChannelHeaderLinksRenderer,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
+pub struct ChannelHeaderLinksRenderer {
+    #[serde(rename = "primaryLinks")]
+    pub primary_links: Vec<AryLink>,
+
+    #[serde(rename = "secondaryLinks")]
+    pub secondary_links: Vec<AryLink>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct AryLink {
+    #[serde(rename = "navigationEndpoint")]
+    pub navigation_endpoint: PrimaryLinkNavigationEndpoint,
+
+    #[serde(rename = "icon")]
+    pub icon: Icon,
+
+    #[serde(rename = "title")]
+    pub title: ContentClass,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Icon {
+    #[serde(rename = "thumbnails")]
+    pub thumbnails: Vec<CommonConfigElement>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct SubscribeButtonClass {
+    #[serde(rename = "buttonRenderer")]
+    pub button_renderer: SubscribeButtonButtonRenderer,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct SubscribeButtonButtonRenderer {
+    #[serde(rename = "style")]
+    pub style: String,
+
+    #[serde(rename = "size")]
+    pub size: Size,
+
+    #[serde(rename = "isDisabled")]
+    pub is_disabled: bool,
+
+    #[serde(rename = "text")]
+    pub text: TextClass,
+
+    #[serde(rename = "navigationEndpoint")]
+    pub navigation_endpoint: Option<FluffyNavigationEndpoint>,
+
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: String,
+
+    #[serde(rename = "command")]
+    pub command: Option<Command>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Command {
+    #[serde(rename = "clickTrackingParams")]
+    pub click_tracking_params: String,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: ServiceEndpointCommandMetadata,
+
+    #[serde(rename = "signalServiceEndpoint")]
+    pub signal_service_endpoint: CommandSignalServiceEndpoint,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct CommandSignalServiceEndpoint {
+    #[serde(rename = "signal")]
+    pub signal: Signal,
+
+    #[serde(rename = "actions")]
+    pub actions: Vec<IndigoAction>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct IndigoAction {
+    #[serde(rename = "clickTrackingParams")]
+    pub click_tracking_params: String,
+
+    #[serde(rename = "signalAction")]
+    pub signal_action: SignalAction,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct SignalAction {
+    #[serde(rename = "signal")]
+    pub signal: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct FluffyNavigationEndpoint {
+    #[serde(rename = "clickTrackingParams")]
+    pub click_tracking_params: String,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: PurpleCommandMetadata,
+
+    #[serde(rename = "modalEndpoint")]
+    pub modal_endpoint: ModalEndpoint,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ModalEndpoint {
+    #[serde(rename = "modal")]
+    pub modal: Modal,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Modal {
+    #[serde(rename = "modalWithTitleAndButtonRenderer")]
+    pub modal_with_title_and_button_renderer: ModalWithTitleAndButtonRenderer,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ModalWithTitleAndButtonRenderer {
+    #[serde(rename = "title")]
+    pub title: ContentClass,
+
+    #[serde(rename = "content")]
+    pub content: ContentClass,
+
+    #[serde(rename = "button")]
+    pub button: Button,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Button {
+    #[serde(rename = "buttonRenderer")]
+    pub button_renderer: ButtonButtonRenderer,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ButtonButtonRenderer {
+    #[serde(rename = "style")]
+    pub style: String,
+
+    #[serde(rename = "size")]
+    pub size: Size,
+
+    #[serde(rename = "isDisabled")]
+    pub is_disabled: bool,
+
+    #[serde(rename = "text")]
+    pub text: ContentClass,
+
+    #[serde(rename = "navigationEndpoint")]
+    pub navigation_endpoint: TentacledNavigationEndpoint,
+
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct TentacledNavigationEndpoint {
+    #[serde(rename = "clickTrackingParams")]
+    pub click_tracking_params: String,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: EndpointCommandMetadata,
+
+    #[serde(rename = "signInEndpoint")]
+    pub sign_in_endpoint: PurpleSignInEndpoint,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct PurpleSignInEndpoint {
+    #[serde(rename = "nextEndpoint")]
+    pub next_endpoint: NextEndpointClass,
+
+    #[serde(rename = "continueAction")]
+    pub continue_action: String,
+
+    #[serde(rename = "idamTag")]
+    pub idam_tag: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Metadata {
+    #[serde(rename = "channelMetadataRenderer")]
+    pub channel_metadata_renderer: ChannelMetadataRenderer,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ChannelMetadataRenderer {
+    #[serde(rename = "title")]
+    pub title: TitleEnum,
+
+    #[serde(rename = "description")]
+    pub description: String,
+
+    #[serde(rename = "rssUrl")]
+    pub rss_url: String,
+
+    #[serde(rename = "externalId")]
+    pub external_id: Id,
+
+    #[serde(rename = "keywords")]
+    pub keywords: String,
+
+    #[serde(rename = "ownerUrls")]
+    pub owner_urls: Vec<String>,
+
+    #[serde(rename = "avatar")]
+    pub avatar: Avatar,
+
+    #[serde(rename = "channelUrl")]
+    pub channel_url: String,
+
+    #[serde(rename = "isFamilySafe")]
+    pub is_family_safe: bool,
+
+    #[serde(rename = "availableCountryCodes")]
+    pub available_country_codes: Vec<String>,
+
+    #[serde(rename = "androidDeepLink")]
+    pub android_deep_link: String,
+
+    #[serde(rename = "androidAppindexingLink")]
+    pub android_appindexing_link: String,
+
+    #[serde(rename = "iosAppindexingLink")]
+    pub ios_appindexing_link: String,
+
+    #[serde(rename = "vanityChannelUrl")]
+    pub vanity_channel_url: String,
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct Microformat {
+    #[serde(rename = "microformatDataRenderer")]
     pub microformat_data_renderer: MicroformatDataRenderer,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct MicroformatDataRenderer {
+    #[serde(rename = "urlCanonical")]
     pub url_canonical: String,
-    pub title: String,
+
+    #[serde(rename = "title")]
+    pub title: TitleEnum,
+
+    #[serde(rename = "description")]
     pub description: String,
-    pub thumbnail: Thumbnail20,
+
+    #[serde(rename = "thumbnail")]
+    pub thumbnail: Avatar,
+
+    #[serde(rename = "siteName")]
     pub site_name: String,
+
+    #[serde(rename = "appName")]
     pub app_name: String,
+
+    #[serde(rename = "androidPackage")]
     pub android_package: String,
+
+    #[serde(rename = "iosAppStoreId")]
     pub ios_app_store_id: String,
+
+    #[serde(rename = "iosAppArguments")]
     pub ios_app_arguments: String,
+
+    #[serde(rename = "ogType")]
     pub og_type: String,
+
+    #[serde(rename = "urlApplinksWeb")]
     pub url_applinks_web: String,
+
+    #[serde(rename = "urlApplinksIos")]
     pub url_applinks_ios: String,
+
+    #[serde(rename = "urlApplinksAndroid")]
     pub url_applinks_android: String,
+
+    #[serde(rename = "urlTwitterIos")]
     pub url_twitter_ios: String,
+
+    #[serde(rename = "urlTwitterAndroid")]
     pub url_twitter_android: String,
+
+    #[serde(rename = "twitterCardType")]
     pub twitter_card_type: String,
+
+    #[serde(rename = "twitterSiteHandle")]
     pub twitter_site_handle: String,
+
+    #[serde(rename = "schemaDotOrgType")]
     pub schema_dot_org_type: String,
+
+    #[serde(rename = "noindex")]
     pub noindex: bool,
+
+    #[serde(rename = "unlisted")]
     pub unlisted: bool,
+
+    #[serde(rename = "familySafe")]
     pub family_safe: bool,
+
+    #[serde(rename = "tags")]
     pub tags: Vec<String>,
+
+    #[serde(rename = "availableCountries")]
     pub available_countries: Vec<String>,
+
+    #[serde(rename = "linkAlternates")]
     pub link_alternates: Vec<LinkAlternate>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail20 {
-    pub thumbnails: Vec<Thumbnail21>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnail21 {
-    pub url: String,
-    pub width: i64,
-    pub height: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize)]
 pub struct LinkAlternate {
+    #[serde(rename = "hrefUrl")]
     pub href_url: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ResponseContext {
+    #[serde(rename = "serviceTrackingParams")]
+    pub service_tracking_params: Vec<ServiceTrackingParam>,
+
+    #[serde(rename = "maxAgeSeconds")]
+    pub max_age_seconds: i64,
+
+    #[serde(rename = "mainAppWebResponseContext")]
+    pub main_app_web_response_context: MainAppWebResponseContext,
+
+    #[serde(rename = "webResponseContextExtensionData")]
+    pub web_response_context_extension_data: WebResponseContextExtensionData,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct MainAppWebResponseContext {
+    #[serde(rename = "loggedOut")]
+    pub logged_out: bool,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ServiceTrackingParam {
+    #[serde(rename = "service")]
+    pub service: String,
+
+    #[serde(rename = "params")]
+    pub params: Vec<Param>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct WebResponseContextExtensionData {
+    #[serde(rename = "ytConfigData")]
+    pub yt_config_data: YtConfigData,
+
+    #[serde(rename = "hasDecorated")]
+    pub has_decorated: bool,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct YtConfigData {
+    #[serde(rename = "visitorData")]
+    pub visitor_data: String,
+
+    #[serde(rename = "rootVisualElementType")]
+    pub root_visual_element_type: i64,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Topbar {
+    #[serde(rename = "desktopTopbarRenderer")]
+    pub desktop_topbar_renderer: DesktopTopbarRenderer,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct DesktopTopbarRenderer {
+    #[serde(rename = "logo")]
+    pub logo: Logo,
+
+    #[serde(rename = "searchbox")]
+    pub searchbox: Searchbox,
+
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: String,
+
+    #[serde(rename = "topbarButtons")]
+    pub topbar_buttons: Vec<TopbarButton>,
+
+    #[serde(rename = "hotkeyDialog")]
+    pub hotkey_dialog: HotkeyDialog,
+
+    #[serde(rename = "backButton")]
+    pub back_button: BackButtonClass,
+
+    #[serde(rename = "forwardButton")]
+    pub forward_button: BackButtonClass,
+
+    #[serde(rename = "a11ySkipNavigationButton")]
+    pub a11_y_skip_navigation_button: SubscribeButtonClass,
+
+    #[serde(rename = "voiceSearchButton")]
+    pub voice_search_button: VoiceSearchButtonClass,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct BackButtonClass {
+    #[serde(rename = "buttonRenderer")]
+    pub button_renderer: BackButtonButtonRenderer,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct BackButtonButtonRenderer {
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: String,
+
+    #[serde(rename = "command")]
+    pub command: Command,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct HotkeyDialog {
+    #[serde(rename = "hotkeyDialogRenderer")]
+    pub hotkey_dialog_renderer: HotkeyDialogRenderer,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct HotkeyDialogRenderer {
+    #[serde(rename = "title")]
+    pub title: TextClass,
+
+    #[serde(rename = "sections")]
+    pub sections: Vec<Section>,
+
+    #[serde(rename = "dismissButton")]
+    pub dismiss_button: SubscribeButtonClass,
+
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Section {
+    #[serde(rename = "hotkeyDialogSectionRenderer")]
+    pub hotkey_dialog_section_renderer: HotkeyDialogSectionRenderer,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct HotkeyDialogSectionRenderer {
+    #[serde(rename = "title")]
+    pub title: TextClass,
+
+    #[serde(rename = "options")]
+    pub options: Vec<Option>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Option {
+    #[serde(rename = "hotkeyDialogSectionOptionRenderer")]
+    pub hotkey_dialog_section_option_renderer: HotkeyDialogSectionOptionRenderer,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct HotkeyDialogSectionOptionRenderer {
+    #[serde(rename = "label")]
+    pub label: TextClass,
+
+    #[serde(rename = "hotkey")]
+    pub hotkey: String,
+
+    #[serde(rename = "hotkeyAccessibilityLabel")]
+    pub hotkey_accessibility_label: Option<HotkeyAccessibilityLabelClass>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Logo {
+    #[serde(rename = "topbarLogoRenderer")]
+    pub topbar_logo_renderer: TopbarLogoRenderer,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct TopbarLogoRenderer {
+    #[serde(rename = "iconImage")]
+    pub icon_image: IconImage,
+
+    #[serde(rename = "tooltipText")]
+    pub tooltip_text: TextClass,
+
+    #[serde(rename = "endpoint")]
+    pub endpoint: TopbarLogoRendererEndpoint,
+
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: String,
+
+    #[serde(rename = "overrideEntityKey")]
+    pub override_entity_key: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Searchbox {
+    #[serde(rename = "fusionSearchboxRenderer")]
+    pub fusion_searchbox_renderer: FusionSearchboxRenderer,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct FusionSearchboxRenderer {
+    #[serde(rename = "icon")]
+    pub icon: IconImage,
+
+    #[serde(rename = "placeholderText")]
+    pub placeholder_text: TextClass,
+
+    #[serde(rename = "config")]
+    pub config: Config,
+
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: String,
+
+    #[serde(rename = "searchEndpoint")]
+    pub search_endpoint: FusionSearchboxRendererSearchEndpoint,
+
+    #[serde(rename = "clearButton")]
+    pub clear_button: VoiceSearchButtonClass,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Config {
+    #[serde(rename = "webSearchboxConfig")]
+    pub web_searchbox_config: WebSearchboxConfig,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct WebSearchboxConfig {
+    #[serde(rename = "requestLanguage")]
+    pub request_language: String,
+
+    #[serde(rename = "requestDomain")]
+    pub request_domain: String,
+
+    #[serde(rename = "hasOnscreenKeyboard")]
+    pub has_onscreen_keyboard: bool,
+
+    #[serde(rename = "focusSearchbox")]
+    pub focus_searchbox: bool,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct FusionSearchboxRendererSearchEndpoint {
+    #[serde(rename = "clickTrackingParams")]
+    pub click_tracking_params: String,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: EndpointCommandMetadata,
+
+    #[serde(rename = "searchEndpoint")]
+    pub search_endpoint: SearchEndpointSearchEndpoint,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct SearchEndpointSearchEndpoint {
+    #[serde(rename = "query")]
+    pub query: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct TopbarButton {
+    #[serde(rename = "topbarMenuButtonRenderer")]
+    pub topbar_menu_button_renderer: Option<TopbarMenuButtonRenderer>,
+
+    #[serde(rename = "buttonRenderer")]
+    pub button_renderer: Option<TopbarButtonButtonRenderer>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct TopbarButtonButtonRenderer {
+    #[serde(rename = "style")]
+    pub style: String,
+
+    #[serde(rename = "size")]
+    pub size: String,
+
+    #[serde(rename = "text")]
+    pub text: TextClass,
+
+    #[serde(rename = "icon")]
+    pub icon: IconImage,
+
+    #[serde(rename = "navigationEndpoint")]
+    pub navigation_endpoint: StickyNavigationEndpoint,
+
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: String,
+
+    #[serde(rename = "targetId")]
+    pub target_id: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct StickyNavigationEndpoint {
+    #[serde(rename = "clickTrackingParams")]
+    pub click_tracking_params: String,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: EndpointCommandMetadata,
+
+    #[serde(rename = "signInEndpoint")]
+    pub sign_in_endpoint: FluffySignInEndpoint,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct FluffySignInEndpoint {
+    #[serde(rename = "idamTag")]
+    pub idam_tag: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct TopbarMenuButtonRenderer {
+    #[serde(rename = "icon")]
+    pub icon: IconImage,
+
+    #[serde(rename = "menuRequest")]
+    pub menu_request: MenuRequest,
+
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: String,
+
+    #[serde(rename = "accessibility")]
+    pub accessibility: HotkeyAccessibilityLabelClass,
+
+    #[serde(rename = "tooltip")]
+    pub tooltip: String,
+
+    #[serde(rename = "style")]
+    pub style: ButtonRendererStyle,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct MenuRequest {
+    #[serde(rename = "clickTrackingParams")]
+    pub click_tracking_params: String,
+
+    #[serde(rename = "commandMetadata")]
+    pub command_metadata: OnCreateListCommandCommandMetadata,
+
+    #[serde(rename = "signalServiceEndpoint")]
+    pub signal_service_endpoint: MenuRequestSignalServiceEndpoint,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct MenuRequestSignalServiceEndpoint {
+    #[serde(rename = "signal")]
+    pub signal: String,
+
+    #[serde(rename = "actions")]
+    pub actions: Vec<IndecentAction>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct IndecentAction {
+    #[serde(rename = "clickTrackingParams")]
+    pub click_tracking_params: String,
+
+    #[serde(rename = "openPopupAction")]
+    pub open_popup_action: FluffyOpenPopupAction,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct FluffyOpenPopupAction {
+    #[serde(rename = "popup")]
+    pub popup: FluffyPopup,
+
+    #[serde(rename = "popupType")]
+    pub popup_type: String,
+
+    #[serde(rename = "beReused")]
+    pub be_reused: bool,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct FluffyPopup {
+    #[serde(rename = "multiPageMenuRenderer")]
+    pub multi_page_menu_renderer: MultiPageMenuRenderer,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct MultiPageMenuRenderer {
+    #[serde(rename = "trackingParams")]
+    pub tracking_params: String,
+
+    #[serde(rename = "style")]
+    pub style: String,
+
+    #[serde(rename = "showLoadingSpinner")]
+    pub show_loading_spinner: bool,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum Id {
+    #[serde(rename = "UC1zFJrfEKvCixhsjNSb1toQ")]
+    Uc1ZFJrfEKvCixhsjNSb1ToQ,
+
+    #[serde(rename = "VLPL5su7mgHJJj8n-bG40uSnU7mtdqhx5Err")]
+    Vlpl5Su7MgHjJj8NBG40USnU7Mtdqhx5Err,
+
+    #[serde(rename = "VLPL5su7mgHJJj_h6_uZ4rcw-efQQFjd3cWq")]
+    Vlpl5Su7MgHjJjH6UZ4RcwEfQqFjd3CWq,
+
+    #[serde(rename = "VLPL5su7mgHJJj_oyH9J7O5yAZeY4NsPMpUP")]
+    Vlpl5Su7MgHjJjOyH9J7O5YAZeY4NsPMpUp,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum CanonicalBaseUrl {
+    #[serde(rename = "/channel/UC1zFJrfEKvCixhsjNSb1toQ")]
+    ChannelUc1ZFJrfEKvCixhsjNSb1ToQ,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum PurpleApiUrl {
+    #[serde(rename = "/youtubei/v1/browse")]
+    YoutubeiV1Browse,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum WebPageType {
+    #[serde(rename = "WEB_PAGE_TYPE_BROWSE")]
+    WebPageTypeBrowse,
+
+    #[serde(rename = "WEB_PAGE_TYPE_CHANNEL")]
+    WebPageTypeChannel,
+
+    #[serde(rename = "WEB_PAGE_TYPE_PLAYLIST")]
+    WebPageTypePlaylist,
+
+    #[serde(rename = "WEB_PAGE_TYPE_SEARCH")]
+    WebPageTypeSearch,
+
+    #[serde(rename = "WEB_PAGE_TYPE_SHORTS")]
+    WebPageTypeShorts,
+
+    #[serde(rename = "WEB_PAGE_TYPE_UNKNOWN")]
+    WebPageTypeUnknown,
+
+    #[serde(rename = "WEB_PAGE_TYPE_WATCH")]
+    WebPageTypeWatch,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum TrackingParams {
+    #[serde(rename = "CBAQ8DsiEwiYyvSo6cf5AhUDSQ8CHe4QDoQ=")]
+    Cbaq8DsiEwiYyvSo6Cf5AhUdsq8CHe4QDoQ,
+
+    #[serde(rename = "CKUDELsvGAAiEwiYyvSo6cf5AhUDSQ8CHe4QDoQ=")]
+    CkudeLsvGaAiEwiYyvSo6Cf5AhUdsq8CHe4QDoQ,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum Target {
+    #[serde(rename = "TARGET_NEW_WINDOW")]
+    TargetNewWindow,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum IconType {
+    #[serde(rename = "ADD_TO_QUEUE_TAIL")]
+    AddToQueueTail,
+
+    #[serde(rename = "AVATAR_LOGGED_OUT")]
+    AvatarLoggedOut,
+
+    #[serde(rename = "CHECK")]
+    Check,
+
+    #[serde(rename = "CHECK_CIRCLE_THICK")]
+    CheckCircleThick,
+
+    #[serde(rename = "CHEVRON_LEFT")]
+    ChevronLeft,
+
+    #[serde(rename = "CHEVRON_RIGHT")]
+    ChevronRight,
+
+    #[serde(rename = "CLOSE")]
+    Close,
+
+    #[serde(rename = "FEEDBACK")]
+    Feedback,
+
+    #[serde(rename = "MICROPHONE_ON")]
+    MicrophoneOn,
+
+    #[serde(rename = "MORE_VERT")]
+    MoreVert,
+
+    #[serde(rename = "PLAY_ALL")]
+    PlayAll,
+
+    #[serde(rename = "PLAYLIST_ADD_CHECK")]
+    PlaylistAddCheck,
+
+    #[serde(rename = "PLAYLISTS")]
+    Playlists,
+
+    #[serde(rename = "SEARCH")]
+    Search,
+
+    #[serde(rename = "WATCH_LATER")]
+    WatchLater,
+
+    #[serde(rename = "YOUTUBE_LOGO")]
+    YoutubeLogo,
+
+    #[serde(rename = "YOUTUBE_SHORTS_BRAND_24")]
+    YoutubeShortsBrand24,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum TitleEnum {
+    #[serde(rename = "シスター・クレア -SisterClaire-")]
+    SisterClaire,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum ReelPlayerOverlayRendererStyle {
+    #[serde(rename = "REEL_PLAYER_OVERLAY_STYLE_SHORTS")]
+    ReelPlayerOverlayStyleShorts,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum ReelWatchEndpointParams {
+    #[serde(rename = "CBEwAg%3D%3D")]
+    CbEwAg3D3D,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum PlayerParams {
+    #[serde(rename = "8AEByAMkuAQR")]
+    The8AeByAMkuAqr,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum SequenceProvider {
+    #[serde(rename = "REEL_WATCH_SEQUENCE_PROVIDER_RPC")]
+    ReelWatchSequenceProviderRpc,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum ReelItemRendererStyle {
+    #[serde(rename = "REEL_ITEM_STYLE_AVATAR_CIRCLE")]
+    ReelItemStyleAvatarCircle,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum VideoType {
+    #[serde(rename = "REEL_VIDEO_TYPE_VIDEO")]
+    ReelVideoTypeVideo,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum WatchEndpointParams {
+    #[serde(rename = "OAI%3D")]
+    Oai3D,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum MetadataBadgeRendererStyle {
+    #[serde(rename = "BADGE_STYLE_TYPE_VERIFIED")]
+    BadgeStyleTypeVerified,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum Tooltip {
+    #[serde(rename = "Verified")]
+    Verified,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum TextEnum {
+    #[serde(rename = "View full playlist")]
+    ViewFullPlaylist,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum ListType {
+    #[serde(rename = "PLAYLIST_EDIT_LIST_TYPE_QUEUE")]
+    PlaylistEditListTypeQueue,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum FluffyApiUrl {
+    #[serde(rename = "/youtubei/v1/account/account_menu")]
+    YoutubeiV1AccountAccountMenu,
+
+    #[serde(rename = "/youtubei/v1/browse/edit_playlist")]
+    YoutubeiV1BrowseEditPlaylist,
+
+    #[serde(rename = "/youtubei/v1/playlist/create")]
+    YoutubeiV1PlaylistCreate,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum CreatePlaylistServiceEndpointParams {
+    #[serde(rename = "CAQ%3D")]
+    Caq3D,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum Signal {
+    #[serde(rename = "CLIENT_SIGNAL")]
+    ClientSignal,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum ThumbnailOverlayTimeStatusRendererStyle {
+    #[serde(rename = "DEFAULT")]
+    Default,
+
+    #[serde(rename = "UPCOMING")]
+    Upcoming,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum HilariousAction {
+    #[serde(rename = "ACTION_REMOVE_VIDEO_BY_VIDEO_ID")]
+    ActionRemoveVideoByVideoId,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum PlaylistId {
+    #[serde(rename = "WL")]
+    Wl,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum ToggledTooltip {
+    #[serde(rename = "Added")]
+    Added,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum AmbitiousAction {
+    #[serde(rename = "ACTION_ADD_VIDEO")]
+    ActionAddVideo,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum UntoggledTooltip {
+    #[serde(rename = "Add to queue")]
+    AddToQueue,
+
+    #[serde(rename = "Watch later")]
+    WatchLater,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum Size {
+    #[serde(rename = "SIZE_DEFAULT")]
+    SizeDefault,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum ButtonRendererStyle {
+    #[serde(rename = "STYLE_DEFAULT")]
+    StyleDefault,
 }

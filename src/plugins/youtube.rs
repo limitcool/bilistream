@@ -30,6 +30,9 @@ impl Live for Youtube {
     async fn get_real_m3u8_url(&self) -> Result<String, Box<dyn Error>> {
         return self.ytdlp();
     }
+    fn set_room(&mut self, room: &str) {
+        self.room = room.to_string();
+    }
 }
 
 impl Youtube {

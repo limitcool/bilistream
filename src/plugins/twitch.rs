@@ -80,6 +80,9 @@ impl Live for Twitch {
     fn room(&self) -> &str {
         &self.room
     }
+    fn set_room(&mut self, room: &str) {
+        self.room = room.to_string();
+    }
 }
 
 impl Twitch {

@@ -25,6 +25,7 @@ pub trait Live {
     async fn get_status(&self) -> Result<bool, Box<dyn Error>>;
     fn room(&self) -> &str;
     async fn get_real_m3u8_url(&self) -> Result<String, Box<dyn Error>>;
+    fn set_room(&mut self, room: &str);
 }
 pub async fn select_live(cfg: Config) -> Result<Box<dyn Live>, Box<dyn Error>> {
     // 设置最大重试次数为4294967295次
@@ -65,6 +66,7 @@ pub async fn select_live(cfg: Config) -> Result<Box<dyn Live>, Box<dyn Error>> {
 
 // https://www.youtube.com/channel/UC1zFJrfEKvCixhsjNSb1toQ
 // 通过channel_name获取channel_id
+#[allow(dead_code)]
 async fn get_channel_id(channel_name: &str) -> Result<String, Box<dyn Error>> {
     let retry_policy = ExponentialBackoff::builder().build_with_max_retries(4294967295);
     let raw_client = reqwest::Client::builder()
@@ -143,8 +145,8 @@ pub async fn get_live_id(channel_name: &str) -> Result<String, Box<dyn Error>> {
                 ["gridVideoRenderer"]["videoId"]
         );
         // 将结果保存为一个json文件
-        // let mut file = std::fs::File::create("live_id.json").unwrap();
-        // std::io::Write::write_all(&mut file, json.as_bytes()).unwrap();
+        let mut file = std::fs::File::create("live_id.json").unwrap();
+        std::io::Write::write_all(&mut file, json.as_bytes()).unwrap();
         return Ok(video_id);
     }
 
@@ -173,4 +175,20 @@ mod tests {
         let r = aw!(get_live_id(channel_id)).unwrap();
         println!("id:{}", r);
     }
+    #[test]
+    fn test_json_path_to_string() {
+        let re = json_path_to_map_string("materials.canvases.0.image_id");
+        println!("re:{}", re);
+    }
+}
+
+#[allow(dead_code)]
+// 传入materials.canvases.0.image_id,返回 ["materials"]["canvases"][0]["image_id"]
+fn json_path_to_map_string(path: &str) -> String {
+    let r = path.split(".");
+    let mut s = String::new();
+    r.for_each(|x| {
+        s.push_str(&format!("[\"{}\"]", x));
+    });
+    return s;
 }

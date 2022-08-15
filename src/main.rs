@@ -26,9 +26,8 @@ async fn main() {
     .with(fmt::layer())
     .init();
     let cfg = load_config(Path::new("./config.yaml")).unwrap();
-    let r = select_live(cfg.clone()).await.unwrap();
+    let mut r = select_live(cfg.clone()).await.unwrap();
     // 设置tracing日志等级为Info
-
     
     loop {
         if r.get_status().await.unwrap_or(false) {
@@ -74,6 +73,13 @@ async fn main() {
                 bili_stop_live(&cfg).await;
                 tracing::info!("B站已关播");
             }
+        }
+        // 判断是否预告类型
+        if cfg.platform == "YoutubePreviewLive" {
+            tracing::info!("检测到预告类型,正在重新获取直播间");
+            r.set_room(get_live_id(cfg.youtube_preview_live.channel_id.as_str())
+            .await
+            .unwrap().as_str())
         }
         // 每60秒检测一下直播状态
         tokio::time::sleep(Duration::from_secs(cfg.interval)).await;
