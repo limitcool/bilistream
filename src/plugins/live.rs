@@ -105,6 +105,7 @@ pub async fn get_live_id(channel_name: &str) -> Result<String, Box<dyn Error>> {
         .build();
     let url = format!("https://www.youtube.com/channel/{}", channel_name);
     tracing::debug!("{}", url);
+    // println!("channel地址为:{}", url);
     let res = client.get(&url).send().await?;
     let body = res.text().await?;
     // 保存body为文件,后缀为html
@@ -131,12 +132,19 @@ pub async fn get_live_id(channel_name: &str) -> Result<String, Box<dyn Error>> {
         // let json = json.split("\"").nth(1).unwrap();
         // let json = json.split("\"").nth(0).unwrap();
         let j: Value = serde_json::from_str(json).unwrap();
-        let video_id = j["contents"]["twoColumnBrowseResultsRenderer"]["tabs"][0]["tabRenderer"]
-            ["content"]["sectionListRenderer"]["contents"][1]["itemSectionRenderer"]["contents"][0]
-            ["shelfRenderer"]["content"]["horizontalListRenderer"]["items"][0]["gridVideoRenderer"]
-            ["videoId"]
+        let mut video_id = j["contents"]["twoColumnBrowseResultsRenderer"]["tabs"][0]
+            ["tabRenderer"]["content"]["sectionListRenderer"]["contents"][1]["itemSectionRenderer"]
+            ["contents"][0]["shelfRenderer"]["content"]["horizontalListRenderer"]["items"][0]
+            ["gridVideoRenderer"]["videoId"]
             .to_string();
-
+        if video_id == "null" {
+            video_id = j["contents"]["twoColumnBrowseResultsRenderer"]["tabs"][0]["tabRenderer"]
+                ["content"]["sectionListRenderer"]["contents"][2]["itemSectionRenderer"]
+                ["contents"][0]["shelfRenderer"]["content"]["horizontalListRenderer"]["items"][0]
+                ["gridVideoRenderer"]["videoId"]
+                .to_string();
+        }
+        // println!("获取到的videoId为:{}", video_id);
         tracing::debug!(
             "{}",
             j["contents"]["twoColumnBrowseResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]
@@ -147,7 +155,10 @@ pub async fn get_live_id(channel_name: &str) -> Result<String, Box<dyn Error>> {
         // 将结果保存为一个json文件
         let mut file = std::fs::File::create("live_id.json").unwrap();
         std::io::Write::write_all(&mut file, json.as_bytes()).unwrap();
-        return Ok(video_id);
+        if video_id == "null" {
+        } else {
+            return Ok(video_id);
+        }
     }
 
     Err("获取video_id失败".into())
