@@ -4,6 +4,18 @@
 
 B站直播转播工具,,一键转播Twitch,Youtube(支持youtube预告类型直播自动转播)
 
+```bash
+# 安装必须依赖ffmpeg,Twitch及youtube都需要安装ffmpeg
+# debian
+apt install ffmpeg -y
+# centos
+yum install ffmpeg -y
+# 如需转播Youtube需单独安装Yt-dlp
+pip3 install yt-dlp
+```
+
+
+
 ## 使用指南
 
 ```bash
@@ -13,6 +25,8 @@ B站直播转播工具,,一键转播Twitch,Youtube(支持youtube预告类型直�
 xz -d bilistream-v0.1.0-aarch64-linux.tar.xz
 tar -xvf bilistream-v0.1.0-aarch64-linux.tar
 cd bilistream-v0.1.0-aarch64-linux
+# 若使用的linux版本glibc库较旧,可尝试使用linux-musl版。
+# linux的编译环境版本为ubuntu-20.04,低于此版本可尝试使用linux-musl
 ./bilistream
 # 在解压目录新建config.yaml
 touch config.yaml
@@ -38,7 +52,7 @@ BiliLive:
 Twitch:
   # Room: maximilian_dood
   Room: 
-# youtube 需要使用AK或者使用Yt-dlp
+# youtube 需要使用Youtube API AK以及Yt-dlp
 Youtube:
   Room: 
   AccessToken: 
@@ -52,3 +66,10 @@ Push:
   # 推送到的qq群号
   Target:
 ```
+
+### Youtube API申请地址
+
+```bash
+https://developers.google.com/youtube/v3
+```
+
