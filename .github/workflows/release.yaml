@@ -25,11 +25,11 @@ jobs:
           rust: stable
           target: x86_64-unknown-linux-gnu
           cross: false
-        # - build: x86_64-linux-musl
-        #   os: ubuntu-latest
-        #   rust: stable
-        #   target: x86_64-unknown-linux-musl
-        #   cross: true
+        - build: x86_64-linux-musl
+          os: ubuntu-latest
+          rust: stable
+          target: x86_64-unknown-linux-musl
+          cross: true
         - build: aarch64-linux
           os: ubuntu-20.04
           rust: stable
