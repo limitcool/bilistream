@@ -3,7 +3,7 @@ mod plugins;
 mod push;
 // use tracing::info;
 use std::{time::{Duration,}};
-use plugins::{select_live, get_live_id};
+use plugins::{select_live, get_live_id_by_jump};
 use push::Mirai;
 use tokio;
 use std::path::Path;
@@ -77,7 +77,7 @@ async fn main() {
         // 判断是否预告类型
         if cfg.platform == "YoutubePreviewLive" {
             tracing::info!("检测到预告类型,正在重新获取直播间");
-            r.set_room(get_live_id(cfg.youtube_preview_live.channel_id.as_str())
+            r.set_room(get_live_id_by_jump(cfg.youtube_preview_live.channel_id.as_str())
             .await
             .unwrap().as_str())
         }

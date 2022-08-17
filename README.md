@@ -20,6 +20,8 @@ apt install ffmpeg -y
 yum install ffmpeg -y
 # 如需转播Youtube需单独安装Yt-dlp
 pip3 install yt-dlp
+# 更新yt-dlp至最新版
+pip3 install -U yt-dlp
 ```
 
 

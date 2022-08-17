@@ -51,7 +51,7 @@ pub async fn select_live(cfg: Config) -> Result<Box<dyn Live>, Box<dyn Error>> {
             client.clone(),
         ))),
         "YoutubePreviewLive" => {
-            let room_id = get_live_id(cfg.youtube_preview_live.channel_id.as_str())
+            let room_id = get_live_id_by_jump(cfg.youtube_preview_live.channel_id.as_str())
                 .await
                 .unwrap();
             Ok(Box::new(Youtube::new(
@@ -91,6 +91,7 @@ async fn get_channel_id(channel_name: &str) -> Result<String, Box<dyn Error>> {
     Ok(room_id.to_string())
 }
 
+#[allow(dead_code)]
 // 通过channel_id获取live_id
 pub async fn get_live_id(channel_name: &str) -> Result<String, Box<dyn Error>> {
     let retry_policy = ExponentialBackoff::builder().build_with_max_retries(1);
@@ -188,8 +189,15 @@ mod tests {
     }
     #[test]
     fn test_json_path_to_string() {
-        let re = json_path_to_map_string("materials.canvases.0.image_id");
+        let re = json_path_to_map_string("x.contents.twoColumnWatchNextResults.results.results.contents[0].videoPrimaryInfoRenderer.videoActions.menuRenderer.topLevelButtons[0].toggleButtonRenderer.defaultNavigationEndpoint.modalEndpoint.modal.modalWithTitleAndButtonRenderer.button.buttonRenderer.navigationEndpoint.signInEndpoint.nextEndpoint.watchEndpoint.videoId");
         println!("re:{}", re);
+    }
+    #[test]
+    fn test_get_jump_url() {
+        // lofi girl
+        let channel_id = "UCSJ4gkVC6NrvII8umztf0Ow";
+        let r = aw!(get_live_id_by_jump(channel_id)).unwrap();
+        println!("url:{}", r);
     }
 }
 
@@ -202,4 +210,68 @@ fn json_path_to_map_string(path: &str) -> String {
         s.push_str(&format!("[\"{}\"]", x));
     });
     return s;
+}
+
+// 通过channel_id获取live_id
+pub async fn get_live_id_by_jump(channel_name: &str) -> Result<String, Box<dyn Error>> {
+    let retry_policy = ExponentialBackoff::builder().build_with_max_retries(1);
+    let raw_client = reqwest::Client::builder()
+        .cookie_store(true)
+        // 设置超时时间为30秒
+        .timeout(Duration::new(30, 0))
+        .build()
+        .unwrap();
+    let client = ClientBuilder::new(raw_client.clone())
+        .with(RetryTransientMiddleware::new_with_policy(retry_policy))
+        .build();
+    let url = format!("https://www.youtube.com/channel/{}/live", channel_name);
+    tracing::debug!("{}", url);
+    // println!("channel地址为:{}", url);
+    let res = client.get(&url).send().await?;
+    let body = res.text().await?;
+    // 保存body为文件,后缀为html
+    let html = prettyish_html::prettify(body.as_str());
+    // let mut file = std::fs::File::create("jump.html").unwrap();
+    // std::io::Write::write_all(&mut file, html.as_bytes()).unwrap();
+
+    let re = regex::Regex::new(r#"\s*<script nonce=".*">var ytInitialData = (.*);\s*?</script>"#)
+        .unwrap();
+    // if re.is_match(html.as_str()) {
+    //     let live_id = re.captures(html.as_str()).unwrap().get(1).unwrap().as_str();
+    //     let live_id = live_id.split("\"").nth(1).unwrap();
+    //     println!("{}", live_id);
+    // } else {
+    //     println!("no match");
+    // }
+    for cap in re.captures(html.as_str()) {
+        let json = cap.get(1).unwrap().as_str();
+        let j: Value = serde_json::from_str(json).unwrap();
+        let mut video_id = j["contents"]["twoColumnWatchNextResults"]["results"]["results"]
+            ["contents"][0]["videoPrimaryInfoRenderer"]["videoActions"]["menuRenderer"]
+            ["topLevelButtons"][0]["toggleButtonRenderer"]["defaultNavigationEndpoint"]
+            ["modalEndpoint"]["modal"]["modalWithTitleAndButtonRenderer"]["button"]
+            ["buttonRenderer"]["navigationEndpoint"]["signInEndpoint"]["nextEndpoint"]
+            ["watchEndpoint"]["videoId"]
+            .to_string();
+        if video_id == "null" {
+            video_id = j["currentVideoEndpoint"]["watchEndpoint"]["videoId"].to_string();
+        }
+        // println!("获取到的videoId为:{}", video_id);
+        tracing::debug!(
+            "{}",
+            j["contents"]["twoColumnBrowseResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]
+                ["sectionListRenderer"]["contents"][1]["itemSectionRenderer"]["contents"][0]
+                ["shelfRenderer"]["content"]["horizontalListRenderer"]["items"][0]
+                ["gridVideoRenderer"]["videoId"]
+        );
+        // 将结果保存为一个json文件
+        let mut file = std::fs::File::create("jump_live_id.json").unwrap();
+        std::io::Write::write_all(&mut file, json.as_bytes()).unwrap();
+        if video_id == "null" {
+        } else {
+            return Ok(video_id);
+        }
+    }
+
+    Err("获取video_id失败".into())
 }

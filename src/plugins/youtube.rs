@@ -17,11 +17,17 @@ impl Live for Youtube {
     }
     async fn get_status(&self) -> Result<bool, Box<dyn Error>> {
         let res = self.client
-        .get(format!("https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id={}&key={}", self.room, self.access_token))
+        .get(format!("https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id={}&key={}", self.room.replace("\"", ""), self.access_token))
         .send()
         .await?;
         let res = res.json::<serde_json::Value>().await?;
-        if res["items"][0]["liveStreamingDetails"].is_null() {
+        // println!("{:?}", self.room);
+        // println!("re{}", res);
+        // println!(
+        //     "AT{}",
+        //     res["items"][0]["liveStreamingDetails"]["actualStartTime"]
+        // );
+        if res["items"][0]["liveStreamingDetails"]["actualStartTime"].is_null() {
             Ok(false)
         } else {
             Ok(true)
@@ -31,7 +37,7 @@ impl Live for Youtube {
         return self.ytdlp();
     }
     fn set_room(&mut self, room: &str) {
-        self.room = room.to_string();
+        self.room = room.to_string().replace("\"", "");
     }
 }
 
@@ -49,7 +55,7 @@ impl Youtube {
         command.arg("-g");
         command.arg(format!(
             "https://www.youtube.com/watch?v={}",
-            self.room.as_str()
+            self.room.as_str().replace("\"", "")
         ));
         match command.status().unwrap().code() {
             Some(code) => {
