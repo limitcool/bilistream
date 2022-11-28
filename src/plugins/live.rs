@@ -165,40 +165,40 @@ pub async fn get_live_id(channel_name: &str) -> Result<String, Box<dyn Error>> {
 }
 
 // 测试get_room_id 传入UC1zFJrfEKvCixhsjNSb1toQ
-#[cfg(test)]
-mod tests {
-    use super::*;
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
 
-    macro_rules! aw {
-        ($e:expr) => {
-            tokio_test::block_on($e)
-        };
-    }
-    #[test]
-    fn test_get_room_id() {
-        let channel_id = "GameSpun";
-        let r = aw!(get_channel_id(channel_id)).unwrap();
-        println!("id:{}", r);
-    }
-    #[test]
-    fn test_get_live_id() {
-        let channel_id = "UC1zFJrfEKvCixhsjNSb1toQ";
-        let r = aw!(get_live_id(channel_id)).unwrap();
-        println!("id:{}", r);
-    }
-    #[test]
-    fn test_json_path_to_string() {
-        let re = json_path_to_map_string("x.contents.twoColumnWatchNextResults.results.results.contents[0].videoPrimaryInfoRenderer.videoActions.menuRenderer.topLevelButtons[0].toggleButtonRenderer.defaultNavigationEndpoint.modalEndpoint.modal.modalWithTitleAndButtonRenderer.button.buttonRenderer.navigationEndpoint.signInEndpoint.nextEndpoint.watchEndpoint.videoId");
-        println!("re:{}", re);
-    }
-    #[test]
-    fn test_get_jump_url() {
-        // lofi girl
-        let channel_id = "UCSJ4gkVC6NrvII8umztf0Ow";
-        let r = aw!(get_live_id_by_jump(channel_id)).unwrap();
-        println!("url:{}", r);
-    }
-}
+//     macro_rules! aw {
+//         ($e:expr) => {
+//             tokio_test::block_on($e)
+//         };
+//     }
+//     #[test]
+//     fn test_get_room_id() {
+//         let channel_id = "GameSpun";
+//         let r = aw!(get_channel_id(channel_id)).unwrap();
+//         println!("id:{}", r);
+//     }
+//     #[test]
+//     fn test_get_live_id() {
+//         let channel_id = "UC1zFJrfEKvCixhsjNSb1toQ";
+//         let r = aw!(get_live_id(channel_id)).unwrap();
+//         println!("id:{}", r);
+//     }
+//     #[test]
+//     fn test_json_path_to_string() {
+//         let re = json_path_to_map_string("x.contents.twoColumnWatchNextResults.results.results.contents[0].videoPrimaryInfoRenderer.videoActions.menuRenderer.topLevelButtons[0].toggleButtonRenderer.defaultNavigationEndpoint.modalEndpoint.modal.modalWithTitleAndButtonRenderer.button.buttonRenderer.navigationEndpoint.signInEndpoint.nextEndpoint.watchEndpoint.videoId");
+//         println!("re:{}", re);
+//     }
+//     #[test]
+//     fn test_get_jump_url() {
+//         // lofi girl
+//         let channel_id = "UCSJ4gkVC6NrvII8umztf0Ow";
+//         let r = aw!(get_live_id_by_jump(channel_id)).unwrap();
+//         println!("url:{}", r);
+//     }
+// }
 
 #[allow(dead_code)]
 // 传入materials.canvases.0.image_id,返回 ["materials"]["canvases"][0]["image_id"]
