@@ -11,7 +11,7 @@ use reqwest::{cookie::Jar, Url};
 use reqwest_retry::policies::ExponentialBackoff;
 use reqwest_retry::RetryTransientMiddleware;
 use reqwest_middleware::{ClientBuilder};
-use tracing_subscriber::{filter::EnvFilter,fmt::{self, format}, layer::SubscriberExt, util::SubscriberInitExt};
+use tracing_subscriber::{filter::EnvFilter,fmt::{self}, layer::SubscriberExt, util::SubscriberInitExt};
 use std::process::Command;
 use config::{load_config,Config};
 
@@ -51,15 +51,15 @@ async fn main() {
 
             if get_bili_live_state(cfg.bililive.room.clone()).await {
                 tracing::info!("B站直播中");
-                ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap());
+                ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap(),cfg.ffmpeg_proxy.clone());
             }else{
                 tracing::info!("B站未直播");
                 bili_start_live(&cfg).await;
                 tracing::info!("B站已开播");
-                ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap());
+                ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap(),cfg.ffmpeg_proxy.clone());
                 loop {
                     if r.get_status().await.unwrap() {
-                        ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap());
+                        ffmpeg(cfg.bililive.bili_rtmp_url.clone(), cfg.bililive.bili_rtmp_key.clone(), r.get_real_m3u8_url().await.unwrap(),cfg.ffmpeg_proxy.clone());
                     }else{
                         break;
                     }
@@ -170,10 +170,17 @@ async fn bili_stop_live(cfg:&Config){
 
 
 
-pub fn ffmpeg(rtmp_url:String,rtmp_key:String,m3u8_url:String){
+pub fn ffmpeg(rtmp_url:String,rtmp_key:String,m3u8_url:String,ffmpeg_proxy:Option<String>){
     // let cmd = format!("{}&key={}",rtmp_url,rtmp_key);
     let cmd = format!("{}{}",rtmp_url,rtmp_key);
     let mut command =Command::new("ffmpeg");
+    // if ffmpeg_proxy.clone()!= "" {
+    //     command.arg(ffmpeg_proxy.clone());
+    // } 
+    if ffmpeg_proxy.is_some() {
+        command.arg("-http_proxy");
+        command.arg(ffmpeg_proxy.clone().unwrap());
+    }
     command.arg("-re");
     command.arg("-i");
     command.arg(m3u8_url.clone());
@@ -190,7 +197,7 @@ pub fn ffmpeg(rtmp_url:String,rtmp_key:String,m3u8_url:String){
         if code == 0 {
             println!("Command executed successfully");
         } else {
-            ffmpeg(rtmp_url, rtmp_key, m3u8_url)
+            ffmpeg(rtmp_url, rtmp_key, m3u8_url,ffmpeg_proxy)
         }
     }
     None => {

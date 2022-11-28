@@ -18,6 +18,9 @@ B站直播自动转播工具,无人值守自动转播Twitch,Youtube(支持youtub
 # 安装必须依赖ffmpeg,Twitch及youtube都需要安装ffmpeg
 # debian
 apt install ffmpeg -y
+# 部分机器可能还需要以下操作
+apt-get update
+apt install python3-pip -y
 # centos
 yum install ffmpeg -y
 # 如需转播Youtube需单独安装Yt-dlp
@@ -79,6 +82,8 @@ Push:
   Host: 127.0.0.1:8080
   # 推送到的qq群号
   Target:
+FfmpegProxy: http://127.0.0.1:7890
+# Ffmpeg代理地址,无需代理可以不填此项或者留空
 ```
 
 ### Youtube API申请地址
@@ -96,4 +101,4 @@ A:BiliRtmpUrl及 BiliRtmpKey 填写错误或使用海外机器进行推流,B站�
 
 Q:转播Youtube时出现`Connection to tcp://manifest.googlevideo.com:443 failed: Error number -138 occurred`
 
-A: YT-DLP获取到的M3U8链接无法正常播放,需要等待Yt-dlp修复或更换其他方式获取M3U8链接。
+A: Ffmpeg拉流未通过代理,请在配置项填写 FfmpegProxy: http://127.0.0.1:7890

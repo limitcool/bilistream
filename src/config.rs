@@ -18,6 +18,8 @@ pub struct Config {
     pub push: Option<Push>,
     #[serde(rename = "YoutubePreviewLive")]
     pub youtube_preview_live: YoutubePreviewLive,
+    #[serde(rename = "FfmpegProxy")]
+    pub ffmpeg_proxy: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
