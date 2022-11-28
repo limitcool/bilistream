@@ -11,7 +11,7 @@ use reqwest::{cookie::Jar, Url};
 use reqwest_retry::policies::ExponentialBackoff;
 use reqwest_retry::RetryTransientMiddleware;
 use reqwest_middleware::{ClientBuilder};
-use tracing_subscriber::{filter::EnvFilter,fmt, layer::SubscriberExt, util::SubscriberInitExt};
+use tracing_subscriber::{filter::EnvFilter,fmt::{self, format}, layer::SubscriberExt, util::SubscriberInitExt};
 use std::process::Command;
 use config::{load_config,Config};
 
@@ -171,7 +171,8 @@ async fn bili_stop_live(cfg:&Config){
 
 
 pub fn ffmpeg(rtmp_url:String,rtmp_key:String,m3u8_url:String){
-    let cmd = format!("{}&key={}",rtmp_url,rtmp_key);
+    // let cmd = format!("{}&key={}",rtmp_url,rtmp_key);
+    let cmd = format!("{}{}",rtmp_url,rtmp_key);
     let mut command =Command::new("ffmpeg");
     command.arg("-re");
     command.arg("-i");
