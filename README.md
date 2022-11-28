@@ -12,7 +12,7 @@
 
 B站直播自动转播工具,无人值守自动转播Twitch,Youtube(支持youtube预告类型直播自动转播)
 
-## QQ群: 715748617
+### QQ群: 715748617
 
 ```bash
 # 安装必须依赖ffmpeg,Twitch及youtube都需要安装ffmpeg
@@ -58,10 +58,10 @@ BiliLive:
   DedeUserID: 2235894
   DedeUserID__ckMd5: 
   Room: 660428
-  BiliRtmpUrl:
-  # BiliRtmpUrl: rtmp://live-push.bilivideo.com/live-bvc/?streamname=live_XXXXXX_XXXXXX
-  BiliRtmpKey: 
-  # BiliRtmpKey: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX (只需要填写key后面的32位密钥)
+  BiliRtmpUrl: rtmp://live-push.bilivideo.com/live-bvc/
+  # BiliRtmpUrl: B站开播设置页面的服务器地址 
+  BiliRtmpKey: "?streamname=live_0000000_0000000&key=xxxxxxxxxxb8289c6acc97xxxxxxxxx&schedule=rtmp&pflag=1"
+  # BiliRtmpKey: B站开播设置页面的串流密钥,需注意,由于是?号开头的,本行需要对内容加双引号
 # Twitch 直播间Id
 Twitch:
   # Room: maximilian_dood
@@ -92,7 +92,7 @@ https://developers.google.com/youtube/v3
 
 Q: 转播时出现  `Input/output error`
 
-A:BiliRtmpUrl及 BiliRtmpKey 填写错误
+A:BiliRtmpUrl及 BiliRtmpKey 填写错误。
 
 Q:转播Youtube时出现Connection to tcp://manifest.googlevideo.com:443 failed: Error number -138 occurred
 
