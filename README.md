@@ -12,6 +12,8 @@
 
 B站直播自动转播工具,无人值守自动转播Twitch,Youtube(支持youtube预告类型直播自动转播)
 
+## QQ群: 715748617
+
 ```bash
 # 安装必须依赖ffmpeg,Twitch及youtube都需要安装ffmpeg
 # debian
@@ -84,6 +86,7 @@ Push:
 ```bash
 https://developers.google.com/youtube/v3
 ```
+
 
 ## 常见问题FAQ
 
