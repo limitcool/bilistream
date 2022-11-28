@@ -56,8 +56,10 @@ BiliLive:
   DedeUserID: 2235894
   DedeUserID__ckMd5: 
   Room: 660428
-  BiliRtmpUrl: 
+  BiliRtmpUrl:
+  # BiliRtmpUrl: rtmp://live-push.bilivideo.com/live-bvc/?streamname=live_XXXXXX_XXXXXX
   BiliRtmpKey: 
+  # BiliRtmpKey: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX (只需要填写key后面的32位密钥)
 # Twitch 直播间Id
 Twitch:
   # Room: maximilian_dood
@@ -83,3 +85,12 @@ Push:
 https://developers.google.com/youtube/v3
 ```
 
+## 常见问题FAQ
+
+Q: 转播时出现  `Input/output error`
+
+A:BiliRtmpUrl及 BiliRtmpKey 填写错误
+
+Q:转播Youtube时出现Connection to tcp://manifest.googlevideo.com:443 failed: Error number -138 occurred
+
+A: YT-DLP获取到的M3U8链接无法正常播放,需要等待Yt-dlp修复或更换其他方式获取M3U8链接。

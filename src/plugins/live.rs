@@ -39,7 +39,6 @@ pub async fn select_live(cfg: Config) -> Result<Box<dyn Live>, Box<dyn Error>> {
     let client = ClientBuilder::new(raw_client.clone())
         .with(RetryTransientMiddleware::new_with_policy(retry_policy))
         .build();
-
     match cfg.platform.as_str() {
         "Youtube" => Ok(Box::new(Youtube::new(
             cfg.youtube.room.as_str(),
