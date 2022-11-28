@@ -92,8 +92,8 @@ https://developers.google.com/youtube/v3
 
 Q: 转播时出现  `Input/output error`
 
-A:BiliRtmpUrl及 BiliRtmpKey 填写错误。
+A:BiliRtmpUrl及 BiliRtmpKey 填写错误或使用海外机器进行推流,B站不支持海外机器推流,建议使用国内服务器+代理推流。
 
-Q:转播Youtube时出现Connection to tcp://manifest.googlevideo.com:443 failed: Error number -138 occurred
+Q:转播Youtube时出现`Connection to tcp://manifest.googlevideo.com:443 failed: Error number -138 occurred`
 
 A: YT-DLP获取到的M3U8链接无法正常播放,需要等待Yt-dlp修复或更换其他方式获取M3U8链接。
