@@ -51,31 +51,34 @@ impl Live for Twitch {
             Ok(false)
         }
     }
+    // async fn get_real_m3u8_url(&self) -> Result<String, Box<dyn Error>> {
+    //     let res: serde_json::Value = self
+    //         .client
+    //         .get(
+    //             format!(
+    //                 "https://api.twitch.tv/api/channels/{}/access_token",
+    //                 self.room
+    //             )
+    //             .as_str(),
+    //         )
+    //         .header("Client-ID", "jzkbprff40iqj646a697cyrvl0zt2m6")
+    //         .send()
+    //         .await?
+    //         .json()
+    //         .await?;
+    //     // println!("{:#?}", res);
+    //     let v = self
+    //         .get_m3u8_url(Token {
+    //             token: res["token"].as_str().unwrap().to_string(),
+    //             expire: res["expires_in"].to_string(),
+    //             sig: res["sig"].as_str().unwrap().to_string(),
+    //         })
+    //         .await?;
+    //     // println!("{:#?}", res);
+    //     return Ok(v);
+    // }
     async fn get_real_m3u8_url(&self) -> Result<String, Box<dyn Error>> {
-        let res: serde_json::Value = self
-            .client
-            .get(
-                format!(
-                    "https://api.twitch.tv/api/channels/{}/access_token",
-                    self.room
-                )
-                .as_str(),
-            )
-            .header("Client-ID", "jzkbprff40iqj646a697cyrvl0zt2m6")
-            .send()
-            .await?
-            .json()
-            .await?;
-        // println!("{:#?}", res);
-        let v = self
-            .get_m3u8_url(Token {
-                token: res["token"].as_str().unwrap().to_string(),
-                expire: res["expires_in"].to_string(),
-                sig: res["sig"].as_str().unwrap().to_string(),
-            })
-            .await?;
-        // println!("{:#?}", res);
-        return Ok(v);
+        return self.ytdlp();
     }
     fn room(&self) -> &str {
         &self.room
@@ -103,6 +106,36 @@ impl Twitch {
             Ok(Playlist::MediaPlaylist(_pl)) => Ok("".to_string()),
             Err(_e) => Err("".into()),
         }
+    }
+
+    pub fn ytdlp(&self) -> Result<String, Box<dyn Error>> {
+        let mut command = std::process::Command::new("yt-dlp");
+        command.arg("-g");
+        command.arg(format!(
+            "https://www.twitch.tv/{}",
+            self.room.as_str().replace("\"", "")
+        ));
+        match command.status().unwrap().code() {
+            Some(code) => {
+                if code == 0 {
+                    let res = command.output().unwrap();
+                    let res = String::from_utf8(res.stdout).unwrap();
+                    Ok(self.replace_url(res.as_str()))
+                } else {
+                    Err(Box::new(std::io::Error::new(
+                        std::io::ErrorKind::Other,
+                        "yt-dlp error",
+                    )))
+                }
+            }
+            None => Err("yt-dlp error".into()),
+        }
+    }
+
+    fn replace_url(&self, content: &str) -> String {
+        let re = regex::Regex::new(r"^WARNING.*").unwrap();
+        let res = re.replace_all(content, "");
+        return res.to_string();
     }
 }
 
