@@ -10,44 +10,52 @@
 
 # bilistream
 
-B站直播自动转播工具,无人值守自动转播Twitch,Youtube(支持youtube预告类型直播自动转播)
+bilistream是一个支持无人值守自动转播Twitch和Youtube（包括预告类型直播）的B站直播自动转播工具。
 
 ### QQ群: 715748617
 
 ```bash
-# 安装必须依赖ffmpeg,Twitch及youtube都需要安装ffmpeg
-# debian
+# Debian
+apt update
+# 安装ffmpeg。
 apt install ffmpeg -y
-# 部分机器可能还需要以下操作
-apt-get update
-apt install python3-pip -y
-# centos
+apt install python3-pip -y # 部分机器可能还需要此操作。
+# CentOS
+# 安装ffmpeg。
 yum install ffmpeg -y
-# 如需转播Youtube需单独安装Yt-dlp
+# 如需转播Youtube，需单独安装Yt-dlp。
 pip3 install yt-dlp
-# 更新yt-dlp至最新版
+# 更新yt-dlp至最新版。
 pip3 install -U yt-dlp
 ```
 
-
-
 ## 使用指南
 
-```bash
-# windows
+### Windows
+
+```
 .\bilistream.exe
-# linux-arm
+```
+
+### Linux-arm
+
+```
 xz -d bilistream-v0.1.0-aarch64-linux.tar.xz
 tar -xvf bilistream-v0.1.0-aarch64-linux.tar
 cd bilistream-v0.1.0-aarch64-linux
-# 若使用的linux版本glibc库较旧,可尝试使用linux-musl版。
-# linux的编译环境版本为ubuntu-20.04,低于此版本可尝试使用linux-musl
 ./bilistream
-# 在解压目录新建config.yaml
+```
+
+若使用的Linux版本glibc库较旧，可尝试使用Linux-musl版。Linux的编译环境版本为Ubuntu 20.04，低于此版本可尝试使用Linux-musl。
+
+在解压目录新建 `config.yaml` 文件：
+
+```
 touch config.yaml
 ```
 
-将以下内容填写至`config.yaml`文件内
+将以下内容填写至 `config.yaml` 文件内：
+
 
 ``` yaml
 # 检测直播间隔
@@ -86,19 +94,13 @@ FfmpegProxy: http://127.0.0.1:7890
 # Ffmpeg代理地址,无需代理可以不填此项或者留空
 ```
 
-### Youtube API申请地址
+## Youtube API申请地址
 
-```bash
 https://developers.google.com/youtube/v3
-```
-
 
 ## 常见问题FAQ
 
-Q: 转播时出现  `Input/output error`
-
-A:BiliRtmpUrl及 BiliRtmpKey 填写错误或使用海外机器进行推流,B站不支持海外机器推流,建议使用国内服务器+代理推流。
-
-Q:转播Youtube时出现`Connection to tcp://manifest.googlevideo.com:443 failed: Error number -138 occurred`
-
-A: Ffmpeg拉流未通过代理,请在配置项填写 FfmpegProxy: http://127.0.0.1:7890
+- Q: 转播时出现 Input/output error
+  - A: 可能是BiliRtmpUrl及BiliRtmpKey填写错误或使用海外机器进行推流。B站不支持海外机器推流，建议使用国内服务器+代理推流。
+- Q: 转播Youtube时出现Connection to tcp://manifest.googlevideo.com:443 failed: Error number -138 occurred
+  - A: 可能是Ffmpeg拉流未通过代理，请在配置项填写 FfmpegProxy: [http://127.0.0.1:7890。](http://127.0.0.1:7890。/)
