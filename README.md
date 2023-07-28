@@ -64,23 +64,23 @@ Interval: 60
 Platform: Twitch
 # B站推流账号Cookie
 BiliLive:
-  SESSDATA: 
-  bili_jct: 
+  SESSDATA:
+  bili_jct:
   DedeUserID: 2235894
-  DedeUserID__ckMd5: 
+  DedeUserID__ckMd5:
   Room: 660428
   BiliRtmpUrl: rtmp://live-push.bilivideo.com/live-bvc/
-  # BiliRtmpUrl: B站开播设置页面的服务器地址 
+  # BiliRtmpUrl: B站开播设置页面的服务器地址
   BiliRtmpKey: "?streamname=live_0000000_0000000&key=xxxxxxxxxxb8289c6acc97xxxxxxxxx&schedule=rtmp&pflag=1"
   # BiliRtmpKey: B站开播设置页面的串流密钥,需注意,由于是?号开头的,本行需要对内容加双引号
 # Twitch 直播间Id
 Twitch:
   # Room: maximilian_dood
-  Room: 
+  Room:
 # youtube 需要使用Youtube API AK以及Yt-dlp
 Youtube:
-  Room: 
-  AccessToken: 
+  Room: UC1zFJrfEKvCixhsjNSb1toQ
+  AccessToken:
 # youtube 预告类型直播转播请填写以下内容
 YoutubePreviewLive:
   ChannelId: UC1zFJrfEKvCixhsjNSb1toQ

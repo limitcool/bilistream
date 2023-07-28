@@ -4,7 +4,7 @@ use reqwest_middleware::ClientWithMiddleware;
 use std::error::Error;
 use std::process::Command;
 
-use super::Live;
+use super::{get_youtube_live_status, Live};
 pub struct Youtube {
     pub room: String,
     pub access_token: String,
@@ -16,22 +16,23 @@ impl Live for Youtube {
         &self.room
     }
     async fn get_status(&self) -> Result<bool, Box<dyn Error>> {
-        let res = self.client
-        .get(format!("https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id={}&key={}", self.room.replace("\"", ""), self.access_token))
-        .send()
-        .await?;
-        let res = res.json::<serde_json::Value>().await?;
-        // println!("{:?}", self.room);
-        // println!("re{}", res);
-        // println!(
-        //     "AT{}",
-        //     res["items"][0]["liveStreamingDetails"]["actualStartTime"]
-        // );
-        if res["items"][0]["liveStreamingDetails"]["actualStartTime"].is_null() {
-            Ok(false)
-        } else {
-            Ok(true)
-        }
+        // let res = self.client
+        // .get(format!("https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id={}&key={}", self.room.replace("\"", ""), self.access_token))
+        // .send()
+        // .await?;
+        // let res = res.json::<serde_json::Value>().await?;
+        // // println!("{:?}", self.room);
+        // // println!("re{}", res);
+        // // println!(
+        // //     "AT{}",
+        // //     res["items"][0]["liveStreamingDetails"]["actualStartTime"]
+        // // );
+        // if res["items"][0]["liveStreamingDetails"]["actualStartTime"].is_null() {
+        //     Ok(false)
+        // } else {
+        //     Ok(true)
+        // }
+        get_youtube_live_status(&self.room).await
     }
     async fn get_real_m3u8_url(&self) -> Result<String, Box<dyn Error>> {
         return self.ytdlp();
@@ -54,7 +55,7 @@ impl Youtube {
         let mut command = Command::new("yt-dlp");
         command.arg("-g");
         command.arg(format!(
-            "https://www.youtube.com/watch?v={}",
+            "https://www.youtube.com/channel{}/live",
             self.room.as_str().replace("\"", "")
         ));
         match command.status().unwrap().code() {
