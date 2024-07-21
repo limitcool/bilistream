@@ -16,7 +16,7 @@ jobs:
     name: Dist
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false # don't fail other jobs if one fails
+      fail-fast: true # don't fail other jobs if one fails
       matrix:
         build: [x86_64-linux, aarch64-linux,x86_64-macos, x86_64-windows, aarch64-macos] #, x86_64-win-gnu, win32-msvc 去除x86_64-linux-musl
         include:
@@ -34,7 +34,7 @@ jobs:
           os: ubuntu-20.04
           rust: stable
           target: aarch64-unknown-linux-gnu
-          cross: false
+          cross: true
         - build: x86_64-macos
           os: macos-latest
           rust: stable
