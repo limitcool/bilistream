@@ -47,12 +47,3 @@ impl Email {
         }
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::Email;
-    use lettre::message::header::{Header, Subject};
-    use lettre::message::MultiPart;
-    use lettre::Message;
-
-}
