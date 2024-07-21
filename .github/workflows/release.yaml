@@ -1,154 +1,179 @@
-name: Build Releases
+name: Release
 on:
   push:
     tags:
-      - v*
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Release Tag'
-        required: true
-        type: string
+    - 'v[0-9]+.[0-9]+.[0-9]+'
+    ## - release
 
 env:
-  CARGO_TERM_COLOR: always
+  BIN_NAME: bilistream
+  PROJECT_NAME: bilistream
+#  REPO_NAME: spectralops/rust-ci-release-template
+#  BREW_TAP: jondot/homebrew-tap
 
 jobs:
-  build-cross:
-    runs-on: ubuntu-latest
-    env:
-      RUST_BACKTRACE: full
-    strategy:
-      fail-fast: false
-      matrix:
-        target:
-          - i686-unknown-linux-musl
-          - x86_64-pc-windows-gnu
-          - x86_64-unknown-linux-gnu
-          - x86_64-unknown-linux-musl
-          # - armv7-unknown-linux-musleabihf
-          # - armv7-unknown-linux-gnueabihf
-          # - arm-unknown-linux-gnueabi
-          # - arm-unknown-linux-gnueabihf
-          # - arm-unknown-linux-musleabi
-          # - arm-unknown-linux-musleabihf
-          - aarch64-unknown-linux-gnu
-          - aarch64-unknown-linux-musl
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Rust
-        run: |
-          rustup set profile minimal
-          rustup toolchain install stable
-          rustup default stable
-          rustup override set stable
-          rustup target add --toolchain stable ${{ matrix.target }}
-
-      - name: Install cross
-        run: cargo install cross
-
-      - name: Build ${{ matrix.target }}
-        timeout-minutes: 120
-        run: |
-          compile_target=${{ matrix.target }}
-
-          compile_features="-f full"
-
-          if [[ "$compile_target" == *"-windows-"* ]]; then
-            compile_features="$compile_features -f winservice"
-          fi
-
-          if [[ "$compile_target" == "mips-"* || "$compile_target" == "mipsel-"* || "$compile_target" == "mips64-"* || "$compile_target" == "mips64el-"* ]]; then
-            sudo apt-get update -y && sudo apt-get install -y upx;
-            if [[ "$?" == "0" ]]; then
-              compile_compress="-u"
-            fi
-          fi
-
-          cd build
-          ./build-release -t ${{ matrix.target }} $compile_features $compile_compress
-
-      - name: Upload Github Assets
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          files: build/release/*
-          prerelease: ${{ contains(github.ref_name, '-') }}
-          tag_name: ${{ inputs.tag || github.ref_name }}
-
-  build-unix:
+  dist:
+    name: Dist
     runs-on: ${{ matrix.os }}
-    env:
-      BUILD_EXTRA_FEATURES: "full"
-      RUST_BACKTRACE: full
     strategy:
-      fail-fast: false
+      fail-fast: false # don't fail other jobs if one fails
       matrix:
-        # os: [ubuntu-latest, macos-latest]
-        os: [macos-latest]
-        target:
-          - x86_64-apple-darwin
-          - aarch64-apple-darwin
+        build: [x86_64-linux, aarch64-linux,x86_64-macos, x86_64-windows, aarch64-macos] #, x86_64-win-gnu, win32-msvc 去除x86_64-linux-musl
+        include:
+        - build: x86_64-linux
+          os: ubuntu-20.04
+          rust: stable
+          target: x86_64-unknown-linux-gnu
+          cross: false
+        - build: x86_64-linux-musl
+          os: ubuntu-latest
+          rust: stable
+          target: x86_64-unknown-linux-musl
+          cross: true
+        - build: aarch64-linux
+          os: ubuntu-20.04
+          rust: stable
+          target: aarch64-unknown-linux-gnu
+          cross: false
+        - build: x86_64-macos
+          os: macos-latest
+          rust: stable
+          target: x86_64-apple-darwin
+          cross: false
+        - build: x86_64-windows
+          os: windows-2019
+          rust: stable
+          target: x86_64-pc-windows-msvc
+          cross: false
+        - build: aarch64-macos
+          os: macos-latest
+          rust: stable
+          target: aarch64-apple-darwin
+          cross: false
+        # - build: x86_64-win-gnu
+        #   os: windows-2019
+        #   rust: stable-x86_64-gnu
+        #   target: x86_64-pc-windows-gnu
+        # - build: win32-msvc
+        #   os: windows-2019
+        #   rust: stable
+        #   target: i686-pc-windows-msvc
+        #   cross: true
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout sources
+        uses: actions/checkout@v2
+        with:
+          submodules: true
 
-      - name: Install GNU tar
-        if: runner.os == 'macOS'
+      - name: Install ${{ matrix.rust }} toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          target: ${{ matrix.target }}
+          override: true
+
+      - name: Run cargo test
+        if: matrix.build != 'aarch64-macos'
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: ${{ matrix.cross }}
+          command: test
+          args: --release --locked --target ${{ matrix.target }}
+
+      - name: Build release binary
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: ${{ matrix.cross }}
+          command: build
+          args: --release --locked --target ${{ matrix.target }}
+
+      - name: Strip release binary (linux and macos)
+        if: matrix.build == 'x86_64-linux' || matrix.build == 'x86_64-macos'
+        run: strip "target/${{ matrix.target }}/release/$BIN_NAME"
+
+      - name: Strip release binary (arm)
+        if: matrix.build == 'aarch64-linux'
         run: |
-          brew install gnu-tar
-          # echo "::add-path::/usr/local/opt/gnu-tar/libexec/gnubin"
-          echo "/usr/local/opt/gnu-tar/libexec/gnubin" >> $GITHUB_PATH
-
-      - name: Install Rust
-        run: |
-          rustup set profile minimal
-          rustup toolchain install stable
-          rustup default stable
-          rustup override set stable
-          rustup target add --toolchain stable ${{ matrix.target }}
-
-      - name: Build release
+          docker run --rm -v \
+            "$PWD/target:/target:Z" \
+            rustembedded/cross:${{ matrix.target }} \
+            aarch64-linux-gnu-strip \
+            /target/${{ matrix.target }}/release/$BIN_NAME
+      - name: Build archive
         shell: bash
         run: |
-          ./build/build-host-release -t ${{ matrix.target }}
-
-      - name: Upload Github Assets
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          mkdir dist
+          if [ "${{ matrix.os }}" = "windows-2019" ]; then
+            cp "target/${{ matrix.target }}/release/$BIN_NAME.exe" "dist/"
+          else
+            cp "target/${{ matrix.target }}/release/$BIN_NAME" "dist/"
+          fi
+      - uses: actions/upload-artifact@v2.2.4
         with:
-          files: build/release/*
-          prerelease: ${{ contains(github.ref_name, '-') }}
-          tag_name: ${{ inputs.tag || github.ref_name }}
+          name: bins-${{ matrix.build }}
+          path: dist
 
-  build-windows:
-    runs-on: windows-latest
-    env:
-      RUSTFLAGS: "-C target-feature=+crt-static"
-      RUST_BACKTRACE: full
+  publish:
+    name: Publish
+    needs: [dist]
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: ilammy/setup-nasm@v1
-
-      - name: Install Rust
-        run: |
-          rustup set profile minimal
-          rustup toolchain install stable
-          rustup default stable
-          rustup override set stable
-
-      - name: Build release
-        run: |
-          pwsh ./build/build-host-release.ps1 "full winservice"
-
-      - name: Upload Github Assets
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout sources
+        uses: actions/checkout@v2
         with:
-          files: build/release/*
-          prerelease: ${{ contains(github.ref_name, '-') }}
-          tag_name: ${{ inputs.tag || github.ref_name }}
+          submodules: false
+
+      - uses: actions/download-artifact@v2
+        # with:
+        #   path: dist
+      # - run: ls -al ./dist
+      - run: ls -al bins-*
+
+      - name: Calculate tag name
+        run: |
+          name=dev
+          if [[ $GITHUB_REF == refs/tags/v* ]]; then
+            name=${GITHUB_REF:10}
+          fi
+          echo ::set-output name=val::$name
+          echo TAG=$name >> $GITHUB_ENV
+        id: tagname
+
+      - name: Build archive
+        shell: bash
+        run: |
+          set -ex
+          rm -rf tmp
+          mkdir tmp
+          mkdir dist
+          for dir in bins-* ; do
+              platform=${dir#"bins-"}
+              if [[ $platform =~ "windows" ]]; then
+                  exe=".exe"
+              fi
+              pkgname=$PROJECT_NAME-$TAG-$platform
+              mkdir tmp/$pkgname
+              # cp LICENSE README.md tmp/$pkgname
+              mv bins-$platform/$BIN_NAME$exe tmp/$pkgname
+              chmod +x tmp/$pkgname/$BIN_NAME$exe
+              if [ "$exe" = "" ]; then
+                  tar cJf dist/$pkgname.tar.xz -C tmp $pkgname
+              else
+                  (cd tmp && 7z a -r ../dist/$pkgname.zip $pkgname)
+              fi
+          done
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: dist/*
+          file_glob: true
+          tag: ${{ steps.tagname.outputs.val }}
+          overwrite: true
+
+      - name: Extract version
+        id: extract-version
+        run: |
+          printf "::set-output name=%s::%s\n" tag-name "${GITHUB_REF#refs/tags/}"
