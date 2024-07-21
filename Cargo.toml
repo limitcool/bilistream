@@ -27,6 +27,7 @@ m3u8-rs = "4.0.0"
 rand = "0.8.5"
 regex = "1.6.0"
 prettyish-html = "0.1.0"
+lettre = "0.11.7"
 # 添加arm交叉编译时不使用openssl 更换为rustls-tls
 [target.'cfg(any(all(target_arch="aarch64", target_vendor="unknown", target_os="linux"), target_env="musl"))'.dependencies]
 reqwest = { version = "0.11", default-features = false, features = [

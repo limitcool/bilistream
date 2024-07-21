@@ -14,8 +14,8 @@ pub struct Config {
     pub youtube: YoutubeC,
     #[serde(rename = "Platform")]
     pub platform: String,
-    #[serde(rename = "Push")]
-    pub push: Option<Push>,
+    #[serde(rename = "Email")]
+    pub email: Option<EmailConfig>,
     #[serde(rename = "YoutubePreviewLive")]
     pub youtube_preview_live: YoutubePreviewLive,
     #[serde(rename = "FfmpegProxy")]
@@ -52,12 +52,25 @@ pub struct YoutubeC {
     pub access_token: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Push {
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct EmailConfig {
+    #[serde(rename = "To")]
+    pub to: String,
+
+    #[serde(rename = "Subject")]
+    pub subject: String,
+
+    #[serde(rename = "Body")]
+    pub body: String,
+
     #[serde(rename = "Host")]
     pub host: String,
-    #[serde(rename = "Target")]
-    pub target: String,
+
+    #[serde(rename = "Sender")]
+    pub sender: String,
+
+    #[serde(rename = "Password")]
+    pub password: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]

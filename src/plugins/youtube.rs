@@ -55,7 +55,7 @@ impl Youtube {
         let mut command = Command::new("yt-dlp");
         command.arg("-g");
         command.arg(format!(
-            "https://www.youtube.com/channel{}/live",
+            "https://www.youtube.com/channel/{}/live",
             self.room.as_str().replace("\"", "")
         ));
         match command.status().unwrap().code() {
