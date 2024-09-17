@@ -70,19 +70,17 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu
-      - name: Install vcpkg
+      - name: Install vcpkg (Windows)
+        if: runner.os == 'Windows'
         uses: lukka/run-vcpkg@v7
         with:
           vcpkgGitCommitId: 'a42af01b72c28a8e1d7b48107b33e4f286a55ef6'
-      - name: Build
-        uses: lukka/run-cmake@v3
-        with:
-          useVcpkgToolchainFile: true
-          buildDirectory: ${{ runner.workspace }}/build
-          cmakeListsOrSettingsJson: CMakeListsTxtBasic
-          cmakeAppendedArgs: '-DCMAKE_BUILD_TYPE=Release'
-        env:
-          VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+          vcpkgTriplet: ${{ matrix.target == 'aarch64-pc-windows-msvc' && 'arm64-windows' || 'x64-windows' }}
+          vcpkgArguments: openssl
+      - name: Set OPENSSL_DIR (Windows)
+        if: runner.os == 'Windows'
+        run: echo "OPENSSL_DIR=${{ github.workspace }}/vcpkg/installed/${{ matrix.target == 'aarch64-pc-windows-msvc' && 'arm64-windows' || 'x64-windows' }}" >> $GITHUB_ENV
+        shell: bash
       - name: Cargo Build
         run: |
           if [ "${{ matrix.target }}" ]; then
