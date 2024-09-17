@@ -1,5 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
+chcp 65001 > nul
 
 REM 检查是否提供了标签版本参数
 if "%~1"=="" (

@@ -74,13 +74,21 @@ jobs:
         run: |
           choco install openssl.light -y
           choco install strawberryperl -y
+          refreshenv
+          $env:PATH = "C:\Strawberry\perl\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\c\bin;$env:PATH"
+          cpan App::cpanminus
           cpanm Locale::Maketext::Simple
-      - name: Set OpenSSL environment variables (Windows)
+          cpanm Params::Check
+          cpanm IPC::Cmd
+        shell: pwsh
+      - name: Set OpenSSL and Perl environment variables (Windows)
         if: runner.os == 'Windows'
         run: |
           echo "OPENSSL_DIR=C:\Program Files\OpenSSL-Win64" >> $GITHUB_ENV
           echo "OPENSSL_LIB_DIR=C:\Program Files\OpenSSL-Win64\lib" >> $GITHUB_ENV
           echo "OPENSSL_INCLUDE_DIR=C:\Program Files\OpenSSL-Win64\include" >> $GITHUB_ENV
+          echo "PERL5LIB=C:\Strawberry\perl\lib;C:\Strawberry\perl\site\lib" >> $GITHUB_ENV
+          echo "C:\Strawberry\perl\bin" >> $GITHUB_PATH
         shell: bash
       - name: Cargo Build
         run: |
