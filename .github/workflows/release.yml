@@ -76,6 +76,17 @@ jobs:
           choco install strawberryperl -y
           refreshenv
           $env:PATH = "C:\Strawberry\perl\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\c\bin;$env:PATH"
+          $env:OPENSSL_DIR = "C:\Program Files\OpenSSL-Win64"
+          $env:OPENSSL_LIB_DIR = "C:\Program Files\OpenSSL-Win64\lib"
+          $env:OPENSSL_INCLUDE_DIR = "C:\Program Files\OpenSSL-Win64\include"
+          $env:PERL5LIB = "C:\Strawberry\perl\lib;C:\Strawberry\perl\site\lib"
+          $env:OPENSSL_NO_VENDOR = "1"
+          [Environment]::SetEnvironmentVariable("PATH", $env:PATH, "Machine")
+          [Environment]::SetEnvironmentVariable("OPENSSL_DIR", $env:OPENSSL_DIR, "Machine")
+          [Environment]::SetEnvironmentVariable("OPENSSL_LIB_DIR", $env:OPENSSL_LIB_DIR, "Machine")
+          [Environment]::SetEnvironmentVariable("OPENSSL_INCLUDE_DIR", $env:OPENSSL_INCLUDE_DIR, "Machine")
+          [Environment]::SetEnvironmentVariable("PERL5LIB", $env:PERL5LIB, "Machine")
+          [Environment]::SetEnvironmentVariable("OPENSSL_NO_VENDOR", $env:OPENSSL_NO_VENDOR, "Machine")
           cpan App::cpanminus
           cpanm Locale::Maketext::Simple
           cpanm Params::Check
