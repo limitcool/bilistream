@@ -76,38 +76,62 @@ jobs:
           choco install strawberryperl -y
           refreshenv
           $env:PATH = "C:\Strawberry\perl\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\c\bin;$env:PATH"
-          $env:OPENSSL_DIR = "C:\Program Files\OpenSSL-Win64"
-          $env:OPENSSL_LIB_DIR = "C:\Program Files\OpenSSL-Win64\lib"
-          $env:OPENSSL_INCLUDE_DIR = "C:\Program Files\OpenSSL-Win64\include"
+          # 检查 OpenSSL 安装位置
+          $opensslPath = (Get-Command openssl).Source
+          Write-Host "OpenSSL path: $opensslPath"
+          $opensslDir = Split-Path -Parent (Split-Path -Parent $opensslPath)
+          Write-Host "OpenSSL directory: $opensslDir"
+          # 设置 OpenSSL 相关环境变量
+          $env:OPENSSL_DIR = $opensslDir
+          $env:OPENSSL_LIB_DIR = Join-Path $opensslDir "lib"
+          $env:OPENSSL_INCLUDE_DIR = Join-Path $opensslDir "include"
+          $env:OPENSSL_CONFIG_DIR = Join-Path $opensslDir "ssl"
+          # 检查目录是否存在
+          if (!(Test-Path $env:OPENSSL_LIB_DIR)) {
+            Write-Host "OpenSSL lib directory not found. Creating it."
+            New-Item -ItemType Directory -Force -Path $env:OPENSSL_LIB_DIR
+          }
+          if (!(Test-Path $env:OPENSSL_INCLUDE_DIR)) {
+            Write-Host "OpenSSL include directory not found. Creating it."
+            New-Item -ItemType Directory -Force -Path $env:OPENSSL_INCLUDE_DIR
+          }
+          # 设置其他环境变量
           $env:PERL5LIB = "C:\Strawberry\perl\lib;C:\Strawberry\perl\site\lib"
           $env:OPENSSL_NO_VENDOR = "1"
           $env:X86_64_PC_WINDOWS_MSVC_OPENSSL_NO_VENDOR = "1"
-          $env:OPENSSL_CONFIG_DIR = "C:\Program Files\OpenSSL-Win64\ssl"
+          # 设置系统环境变量
           [Environment]::SetEnvironmentVariable("PATH", $env:PATH, "Machine")
           [Environment]::SetEnvironmentVariable("OPENSSL_DIR", $env:OPENSSL_DIR, "Machine")
           [Environment]::SetEnvironmentVariable("OPENSSL_LIB_DIR", $env:OPENSSL_LIB_DIR, "Machine")
           [Environment]::SetEnvironmentVariable("OPENSSL_INCLUDE_DIR", $env:OPENSSL_INCLUDE_DIR, "Machine")
+          [Environment]::SetEnvironmentVariable("OPENSSL_CONFIG_DIR", $env:OPENSSL_CONFIG_DIR, "Machine")
           [Environment]::SetEnvironmentVariable("PERL5LIB", $env:PERL5LIB, "Machine")
           [Environment]::SetEnvironmentVariable("OPENSSL_NO_VENDOR", $env:OPENSSL_NO_VENDOR, "Machine")
           [Environment]::SetEnvironmentVariable("X86_64_PC_WINDOWS_MSVC_OPENSSL_NO_VENDOR", $env:X86_64_PC_WINDOWS_MSVC_OPENSSL_NO_VENDOR, "Machine")
-          [Environment]::SetEnvironmentVariable("OPENSSL_CONFIG_DIR", $env:OPENSSL_CONFIG_DIR, "Machine")
+          # 显示目录内容
+          Write-Host "OpenSSL directory contents:"
+          Get-ChildItem $env:OPENSSL_DIR -Recurse
+          # 安装 Perl 模块
           cpan App::cpanminus
           cpanm Locale::Maketext::Simple
           cpanm Params::Check
           cpanm IPC::Cmd
         shell: pwsh
+
       - name: Set OpenSSL and Perl environment variables (Windows)
         if: runner.os == 'Windows'
         run: |
-          echo "OPENSSL_DIR=C:\Program Files\OpenSSL-Win64" >> $GITHUB_ENV
-          echo "OPENSSL_LIB_DIR=C:\Program Files\OpenSSL-Win64\lib" >> $GITHUB_ENV
-          echo "OPENSSL_INCLUDE_DIR=C:\Program Files\OpenSSL-Win64\include" >> $GITHUB_ENV
-          echo "PERL5LIB=C:\Strawberry\perl\lib;C:\Strawberry\perl\site\lib" >> $GITHUB_ENV
-          echo "OPENSSL_NO_VENDOR=1" >> $GITHUB_ENV
-          echo "X86_64_PC_WINDOWS_MSVC_OPENSSL_NO_VENDOR=1" >> $GITHUB_ENV
-          echo "OPENSSL_CONFIG_DIR=C:\Program Files\OpenSSL-Win64\ssl" >> $GITHUB_ENV
+          echo "OPENSSL_DIR=$env:OPENSSL_DIR" >> $GITHUB_ENV
+          echo "OPENSSL_LIB_DIR=$env:OPENSSL_LIB_DIR" >> $GITHUB_ENV
+          echo "OPENSSL_INCLUDE_DIR=$env:OPENSSL_INCLUDE_DIR" >> $GITHUB_ENV
+          echo "OPENSSL_CONFIG_DIR=$env:OPENSSL_CONFIG_DIR" >> $GITHUB_ENV
+          echo "PERL5LIB=$env:PERL5LIB" >> $GITHUB_ENV
+          echo "OPENSSL_NO_VENDOR=$env:OPENSSL_NO_VENDOR" >> $GITHUB_ENV
+          echo "X86_64_PC_WINDOWS_MSVC_OPENSSL_NO_VENDOR=$env:X86_64_PC_WINDOWS_MSVC_OPENSSL_NO_VENDOR" >> $GITHUB_ENV
+          echo "$env:OPENSSL_DIR\bin" >> $GITHUB_PATH
           echo "C:\Strawberry\perl\bin" >> $GITHUB_PATH
         shell: bash
+
       - name: Cargo Build
         run: |
           if [ "${{ runner.os }}" = "Linux" ]; then
@@ -124,6 +148,7 @@ jobs:
             fi
           fi
         shell: bash
+
       - name: List target directory
         run: |
           if [ "${{ matrix.target }}" ]; then
@@ -132,6 +157,7 @@ jobs:
             ls -R target/release
           fi
         shell: bash
+
       - name: Prepare asset
         run: |
           if [ "${{ matrix.target }}" ]; then
@@ -140,6 +166,7 @@ jobs:
             cp target/release/${{ matrix.artifact_name }} ${{ matrix.artifact_name }}
           fi
         shell: bash
+
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
