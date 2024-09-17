@@ -41,24 +41,24 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact_name: bilistream
-            asset_name: bilistream-linux-x86_64
+            asset_name: linux-x86_64
           - os: ubuntu-latest
             artifact_name: bilistream
-            asset_name: bilistream-linux-aarch64
+            asset_name: linux-aarch64
             target: aarch64-unknown-linux-gnu
           - os: windows-latest
             artifact_name: bilistream.exe
-            asset_name: bilistream-windows-x86_64
+            asset_name: windows-x86_64
           - os: windows-latest
             artifact_name: bilistream.exe
-            asset_name: bilistream-windows-aarch64
+            asset_name: windows-aarch64
             target: aarch64-pc-windows-msvc
           - os: macOS-latest
             artifact_name: bilistream
-            asset_name: bilistream-macos-x86_64
+            asset_name: macos-x86_64
           - os: macOS-latest
             artifact_name: bilistream
-            asset_name: bilistream-macos-aarch64
+            asset_name: macos-aarch64
             target: aarch64-apple-darwin
     steps:
       - uses: actions/checkout@v4
@@ -70,20 +70,23 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu
-      - name: Install vcpkg and OpenSSL (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          git clone https://github.com/Microsoft/vcpkg.git
-          .\vcpkg\bootstrap-vcpkg.bat
-          .\vcpkg\vcpkg install openssl:x64-windows-static
-          echo "OPENSSL_DIR=$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows-static" | Out-File -FilePath $env:GITHUB_ENV -Append
-          echo "OPENSSL_STATIC=1" | Out-File -FilePath $env:GITHUB_ENV -Append
-      - name: Install cross
-        run: cargo install cross
+      - name: Install vcpkg
+        uses: lukka/run-vcpkg@v7
+        with:
+          vcpkgGitCommitId: 'a42af01b72c28a8e1d7b48107b33e4f286a55ef6'
       - name: Build
+        uses: lukka/run-cmake@v3
+        with:
+          useVcpkgToolchainFile: true
+          buildDirectory: ${{ runner.workspace }}/build
+          cmakeListsOrSettingsJson: CMakeListsTxtBasic
+          cmakeAppendedArgs: '-DCMAKE_BUILD_TYPE=Release'
+        env:
+          VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+      - name: Cargo Build
         run: |
           if [ "${{ matrix.target }}" ]; then
-            cross build --release --target ${{ matrix.target }}
+            cargo build --release --target ${{ matrix.target }}
           else
             cargo build --release
           fi
