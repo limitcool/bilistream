@@ -74,11 +74,13 @@ jobs:
         uses: lukka/run-vcpkg@v7
         with:
           vcpkgGitCommitId: 'a42af01b72c28a8e1d7b48107b33e4f286a55ef6'
-          vcpkgTriplet: ${{ matrix.target == 'aarch64-pc-windows-msvc' && 'arm64-windows' || 'x64-windows' }}
+          vcpkgTriplet: ${{ matrix.target == 'aarch64-pc-windows-msvc' && 'arm64-windows-static' || 'x64-windows-static' }}
           vcpkgArguments: openssl
-      - name: Set OPENSSL_DIR (Windows)
+      - name: Set OPENSSL_DIR and OPENSSL_STATIC (Windows)
         if: runner.os == 'Windows'
-        run: echo "OPENSSL_DIR=${{ github.workspace }}/vcpkg/installed/${{ matrix.target == 'aarch64-pc-windows-msvc' && 'arm64-windows' || 'x64-windows' }}" >> $GITHUB_ENV
+        run: |
+          echo "OPENSSL_DIR=${{ github.workspace }}/vcpkg/installed/${{ matrix.target == 'aarch64-pc-windows-msvc' && 'arm64-windows-static' || 'x64-windows-static' }}" >> $GITHUB_ENV
+          echo "OPENSSL_STATIC=1" >> $GITHUB_ENV
         shell: bash
       - name: Cargo Build
         run: |
@@ -94,6 +96,14 @@ jobs:
             else
               cargo build --release
             fi
+          fi
+        shell: bash
+      - name: List target directory
+        run: |
+          if [ "${{ matrix.target }}" ]; then
+            ls -R target/${{ matrix.target }}/release
+          else
+            ls -R target/release
           fi
         shell: bash
       - name: Upload Release Asset
