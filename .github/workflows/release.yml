@@ -48,10 +48,10 @@ jobs:
             target: aarch64-unknown-linux-gnu
           - os: windows-latest
             artifact_name: bilistream.exe
-            asset_name: bilistream-windows-x86_64.exe
+            asset_name: bilistream-windows-x86_64
           - os: windows-latest
             artifact_name: bilistream.exe
-            asset_name: bilistream-windows-aarch64.exe
+            asset_name: bilistream-windows-aarch64
             target: aarch64-pc-windows-msvc
           - os: macOS-latest
             artifact_name: bilistream
@@ -70,11 +70,17 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu
+      - name: Install vcpkg and OpenSSL (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          git clone https://github.com/Microsoft/vcpkg.git
+          .\vcpkg\bootstrap-vcpkg.bat
+          .\vcpkg\vcpkg install openssl:x64-windows-static
+          echo "OPENSSL_DIR=$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows-static" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "OPENSSL_STATIC=1" | Out-File -FilePath $env:GITHUB_ENV -Append
       - name: Install cross
         run: cargo install cross
       - name: Build
-        env:
-          OPENSSL_STATIC: 1
         run: |
           if [ "${{ matrix.target }}" ]; then
             cross build --release --target ${{ matrix.target }}
@@ -89,5 +95,5 @@ jobs:
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
           asset_path: ${{ matrix.target && format('target/{0}/release/{1}', matrix.target, matrix.artifact_name) || format('target/release/{0}', matrix.artifact_name) }}
-          asset_name: ${{ matrix.asset_name }}-${{ needs.create-release.outputs.version }}
+          asset_name: bilistream-${{ needs.create-release.outputs.version }}-${{ matrix.asset_name }}
           asset_content_type: application/octet-stream
