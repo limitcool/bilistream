@@ -9,8 +9,27 @@ on:
     branches: [ main ]
 
 jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
   build-and-release:
     name: Build and Release
+    needs: create-release
     runs-on: ${{ matrix.os }}
     if: startsWith(github.ref, 'refs/tags/')
     strategy:
@@ -57,23 +76,12 @@ jobs:
             cargo build --release
           fi
         shell: bash
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-        if: matrix.os == 'ubuntu-latest' && !matrix.target
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
           asset_path: ${{ matrix.target && format('target/{0}/release/{1}', matrix.target, matrix.artifact_name) || format('target/release/{0}', matrix.artifact_name) }}
           asset_name: ${{ matrix.asset_name }}
           asset_content_type: application/octet-stream
