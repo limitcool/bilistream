@@ -23,7 +23,6 @@ jobs:
             artifact_name: bilistream
             asset_name: bilistream-linux-aarch64
             target: aarch64-unknown-linux-gnu
-            use_cross: true
           - os: windows-latest
             artifact_name: bilistream.exe
             asset_name: bilistream-windows-x86_64.exe
@@ -31,7 +30,6 @@ jobs:
             artifact_name: bilistream.exe
             asset_name: bilistream-windows-aarch64.exe
             target: aarch64-pc-windows-msvc
-            use_cross: true
           - os: macOS-latest
             artifact_name: bilistream
             asset_name: bilistream-macos-x86_64
@@ -39,7 +37,6 @@ jobs:
             artifact_name: bilistream
             asset_name: bilistream-macos-aarch64
             target: aarch64-apple-darwin
-            use_cross: true
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -50,6 +47,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libssl-dev pkg-config
+          if [ "${{ matrix.target }}" = "aarch64-unknown-linux-gnu" ]; then
+            sudo apt-get install -y gcc-aarch64-linux-gnu
+            sudo ln -s /usr/bin/aarch64-linux-gnu-gcc /usr/bin/aarch64-linux-gnu-cc
+          fi
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
         run: brew install openssl pkg-config
@@ -59,13 +60,13 @@ jobs:
           choco install openssl pkgconfiglite
           echo "OPENSSL_DIR=C:\Program Files\OpenSSL-Win64" >> $GITHUB_ENV
           echo "PKG_CONFIG_PATH=C:\Program Files\OpenSSL-Win64\lib\pkgconfig" >> $GITHUB_ENV
-      - name: Install cross-compilation tools
-        if: matrix.use_cross
-        uses: taiki-e/install-action@cross
       - name: Build
         run: |
-          if [ "${{ matrix.use_cross }}" = "true" ]; then
-            cross build --release --target ${{ matrix.target }}
+          if [ "${{ matrix.target }}" ]; then
+            export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc
+            export CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc
+            export OPENSSL_DIR=/usr/aarch64-linux-gnu
+            cargo build --release --target ${{ matrix.target }}
           else
             cargo build --release
           fi
