@@ -81,12 +81,16 @@ jobs:
           $env:OPENSSL_INCLUDE_DIR = "C:\Program Files\OpenSSL-Win64\include"
           $env:PERL5LIB = "C:\Strawberry\perl\lib;C:\Strawberry\perl\site\lib"
           $env:OPENSSL_NO_VENDOR = "1"
+          $env:X86_64_PC_WINDOWS_MSVC_OPENSSL_NO_VENDOR = "1"
+          $env:OPENSSL_CONFIG_DIR = "C:\Program Files\OpenSSL-Win64\ssl"
           [Environment]::SetEnvironmentVariable("PATH", $env:PATH, "Machine")
           [Environment]::SetEnvironmentVariable("OPENSSL_DIR", $env:OPENSSL_DIR, "Machine")
           [Environment]::SetEnvironmentVariable("OPENSSL_LIB_DIR", $env:OPENSSL_LIB_DIR, "Machine")
           [Environment]::SetEnvironmentVariable("OPENSSL_INCLUDE_DIR", $env:OPENSSL_INCLUDE_DIR, "Machine")
           [Environment]::SetEnvironmentVariable("PERL5LIB", $env:PERL5LIB, "Machine")
           [Environment]::SetEnvironmentVariable("OPENSSL_NO_VENDOR", $env:OPENSSL_NO_VENDOR, "Machine")
+          [Environment]::SetEnvironmentVariable("X86_64_PC_WINDOWS_MSVC_OPENSSL_NO_VENDOR", $env:X86_64_PC_WINDOWS_MSVC_OPENSSL_NO_VENDOR, "Machine")
+          [Environment]::SetEnvironmentVariable("OPENSSL_CONFIG_DIR", $env:OPENSSL_CONFIG_DIR, "Machine")
           cpan App::cpanminus
           cpanm Locale::Maketext::Simple
           cpanm Params::Check
@@ -99,6 +103,9 @@ jobs:
           echo "OPENSSL_LIB_DIR=C:\Program Files\OpenSSL-Win64\lib" >> $GITHUB_ENV
           echo "OPENSSL_INCLUDE_DIR=C:\Program Files\OpenSSL-Win64\include" >> $GITHUB_ENV
           echo "PERL5LIB=C:\Strawberry\perl\lib;C:\Strawberry\perl\site\lib" >> $GITHUB_ENV
+          echo "OPENSSL_NO_VENDOR=1" >> $GITHUB_ENV
+          echo "X86_64_PC_WINDOWS_MSVC_OPENSSL_NO_VENDOR=1" >> $GITHUB_ENV
+          echo "OPENSSL_CONFIG_DIR=C:\Program Files\OpenSSL-Win64\ssl" >> $GITHUB_ENV
           echo "C:\Strawberry\perl\bin" >> $GITHUB_PATH
         shell: bash
       - name: Cargo Build
