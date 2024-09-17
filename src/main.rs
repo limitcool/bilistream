@@ -1,6 +1,8 @@
 mod config;
 mod email;
 mod plugins;
+mod push; // 新增这行
+
 // use tracing::info;
 use config::{load_config, Config};
 use plugins::select_live;
@@ -20,6 +22,7 @@ use tracing_subscriber::{
 };
 
 use crate::plugins::get_live_id_by_jump;
+use crate::push::send_gotify_notification; // 新增这行
 
 #[tokio::main]
 async fn main() {
@@ -37,6 +40,16 @@ async fn main() {
     loop {
         if r.get_status().await.unwrap_or(false) {
             tracing::info!("{}", format!("{}直播中", r.room()));
+
+            // 添加Gotify推送
+            if let Some(ref gotify_config) = cfg.gotify {
+                send_gotify_notification(
+                    &gotify_config,
+                    &format!("{}开始直播", r.room()),
+                    "bilistream",
+                )
+                .await;
+            }
 
             match cfg.email {
                 Some(ref email) => {
@@ -266,3 +279,25 @@ pub fn ffmpeg(rtmp_url: String, rtmp_key: String, m3u8_url: String, ffmpeg_proxy
         }
     }
 }
+
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//     use config::GotifyConfig;
+//     use tokio;
+
+//     #[tokio::test]
+//     async fn test_send_gotify_notification() {
+//         // 创建一个模拟的GotifyConfig
+//         let config = GotifyConfig {
+//             url: "https://gotify.com".to_string(),
+//             token: "".to_string(),
+//         };
+
+//         // 准备测试消息
+//         let message = "这是一条测试通知";
+
+//         // 调用发送通知函数
+//         send_gotify_notification(&config, message, "bilistream测试").await;
+//     }
+// }

@@ -1,4 +1,3 @@
-```
  _     _ _ _     _
 | |__ (_) (_)___| |_ _ __ ___  __ _ _ __ ___
 | '_ \| | | / __| __| '__/ _ \/ _` | '_ ` _ \
@@ -40,9 +39,9 @@ pip3 install -U yt-dlp
 ### Linux-arm
 
 ```
-xz -d bilistream-v0.1.0-aarch64-linux.tar.xz
-tar -xvf bilistream-v0.1.0-aarch64-linux.tar
-cd bilistream-v0.1.0-aarch64-linux
+xz -d bilistream-v0.1.11-aarch64-linux.tar.xz
+tar -xvf bilistream-v0.1.11-aarch64-linux.tar
+cd bilistream-v0.1.11-aarch64-linux
 ./bilistream
 ```
 
@@ -84,14 +83,17 @@ Youtube:
 # youtube 预告类型直播转播请填写以下内容
 YoutubePreviewLive:
   ChannelId: UC1zFJrfEKvCixhsjNSb1toQ
-# QQ群推送功能,需在本地部署QQ机器人
-Push:
-  # 本地QQ机器人的Api地址: 127.0.0.1:8080
-  Host: 127.0.0.1:8080
-  # 推送到的qq群号
-  Target:
 FfmpegProxy: http://127.0.0.1:7890
 # Ffmpeg代理地址,无需代理可以不填此项或者留空
+
+### Gotify推送配置 (可选)
+
+如果您想使用Gotify进行推送通知,请在`config.yaml`中添加以下配置:
+
+```yaml
+Gotify:
+  url: "https://example.com/gotify"
+  token: "your_gotify_token_here"
 ```
 
 ## Youtube API申请地址

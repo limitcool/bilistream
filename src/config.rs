@@ -20,6 +20,8 @@ pub struct Config {
     pub youtube_preview_live: YoutubePreviewLive,
     #[serde(rename = "FfmpegProxy")]
     pub ffmpeg_proxy: Option<String>,
+    #[serde(rename = "Gotify")]
+    pub gotify: Option<GotifyConfig>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -38,6 +40,7 @@ pub struct BiliLive {
     #[serde(rename = "BiliRtmpKey")]
     pub bili_rtmp_key: String,
 }
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TwitchC {
     #[serde(rename = "Room")]
@@ -86,4 +89,12 @@ pub fn load_config(config: &Path) -> Result<Config, Box<dyn Error>> {
     let config: Config = serde_yaml::from_reader(file)?;
     // println!("body = {:?}", client);
     Ok(config)
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct GotifyConfig {
+    #[serde(rename = "Url")]
+    pub url: String,
+    #[serde(rename = "Token")]
+    pub token: String,
 }
