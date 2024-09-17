@@ -69,9 +69,19 @@ jobs:
       - name: Install cross (Linux aarch64)
         if: runner.os == 'Linux' && matrix.target == 'aarch64-unknown-linux-gnu'
         run: cargo install cross
-      - name: Install OpenSSL (Windows)
+      - name: Install OpenSSL and Perl modules (Windows)
         if: runner.os == 'Windows'
-        run: choco upgrade openssl.light
+        run: |
+          choco install openssl.light -y
+          choco install strawberryperl -y
+          cpanm Locale::Maketext::Simple
+      - name: Set OpenSSL environment variables (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          echo "OPENSSL_DIR=C:\Program Files\OpenSSL-Win64" >> $GITHUB_ENV
+          echo "OPENSSL_LIB_DIR=C:\Program Files\OpenSSL-Win64\lib" >> $GITHUB_ENV
+          echo "OPENSSL_INCLUDE_DIR=C:\Program Files\OpenSSL-Win64\include" >> $GITHUB_ENV
+        shell: bash
       - name: Cargo Build
         run: |
           if [ "${{ runner.os }}" = "Linux" ]; then
