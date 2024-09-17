@@ -88,9 +88,8 @@ FfmpegProxy: http://127.0.0.1:7890
 
 ### Gotify推送配置 (可选)
 
-如果您想使用Gotify进行推送通知,请在`config.yaml`中添加以下配置:
+# 如果您想使用Gotify进行推送通知,请在`config.yaml`中添加以下配置:
 
-```yaml
 Gotify:
   url: "https://example.com/gotify"
   token: "your_gotify_token_here"

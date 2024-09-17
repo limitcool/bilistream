@@ -1,0 +1,78 @@
+name: Rust CI
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-release:
+    name: Build and Release
+    runs-on: ${{ matrix.os }}
+    if: startsWith(github.ref, 'refs/tags/')
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: bilistream
+            asset_name: bilistream-linux-x86_64
+          - os: ubuntu-latest
+            artifact_name: bilistream
+            asset_name: bilistream-linux-aarch64
+            target: aarch64-unknown-linux-gnu
+            use_cross: true
+          - os: windows-latest
+            artifact_name: bilistream.exe
+            asset_name: bilistream-windows-x86_64.exe
+          - os: windows-latest
+            artifact_name: bilistream.exe
+            asset_name: bilistream-windows-aarch64.exe
+            target: aarch64-pc-windows-msvc
+            use_cross: true
+          - os: macOS-latest
+            artifact_name: bilistream
+            asset_name: bilistream-macos-x86_64
+          - os: macOS-latest
+            artifact_name: bilistream
+            asset_name: bilistream-macos-aarch64
+            target: aarch64-apple-darwin
+            use_cross: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - name: Install cross-compilation tools
+        if: matrix.use_cross
+        uses: taiki-e/install-action@cross
+      - name: Build
+        run: |
+          if [ "${{ matrix.use_cross }}" = "true" ]; then
+            cross build --release --target ${{ matrix.target }}
+          else
+            cargo build --release
+          fi
+        shell: bash
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+        if: matrix.os == 'ubuntu-latest' && !matrix.target
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ matrix.target && format('./target/{}/release/{}', matrix.target, matrix.artifact_name) || format('./target/release/{}', matrix.artifact_name) }}
+          asset_name: ${{ matrix.asset_name }}
+          asset_content_type: application/octet-stream
