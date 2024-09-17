@@ -1,5 +1,4 @@
 mod config;
-mod email;
 mod plugins;
 mod push; // 新增这行
 
@@ -51,25 +50,6 @@ async fn main() {
                 .await;
             }
 
-            match cfg.email {
-                Some(ref email) => {
-                    if &email.host == "~"
-                        || &email.password == "~"
-                        || &email.sender == "~"
-                        || &email.to == "~"
-                    {
-                        tracing::info!("如需使用推送请在config.yaml中配置Email信息");
-                    } else {
-                        let e: email::Email = email.to_owned().into();
-                        e.send_email();
-                        // let p = Mirai::new(push.host.clone(), push.target.clone());
-                        // p.send_message(r.room().to_string(),cfg.bililive.room.to_string()).await;
-                    }
-                }
-                None => {
-                    tracing::info!("如需使用推送请在config.yaml中配置Email信息");
-                }
-            };
 
             if get_bili_live_state(cfg.bililive.room.clone()).await {
                 tracing::info!("B站直播中");

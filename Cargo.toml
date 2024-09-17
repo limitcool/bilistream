@@ -6,6 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+reqwest = { version = "0.11.27", default-features = false, features = [
+    "cookies",
+    "json",
+    "rustls-tls",
+] }
 reqwest-middleware = "0.1.6"
 reqwest-retry = "0.1.5"
 tokio = { version = "1", features = ["full"] }
@@ -27,25 +32,9 @@ m3u8-rs = "4.0.0"
 rand = "0.8.5"
 regex = "1.6.0"
 prettyish-html = "0.1.0"
-# lettre = "0.11.7"
-lettre = { version = "0.11.7", features = [
-    "rustls-tls",
-    "builder",
-    "smtp-transport",
-], default-features = false }
+rustls = "0.21.0"
+rustls-native-certs = "0.6.2"
 
-# 添加arm交叉编译时不使用openssl 更换为rustls-tls
-# [target.'cfg(any(all(target_arch="aarch64", target_vendor="unknown", target_os="linux"), target_env="musl"))'.dependencies]
-# reqwest = { version = "0.11", default-features = false, features = [
-#     "json",
-#     "cookies",
-#     "rustls-tls",
-# ] }
+# 移除了openssl相关的配置
 
-# [target.'cfg(not(any(all(target_arch="aarch64", target_vendor="unknown", target_os="linux"), target_env="musl")))'.dependencies]
-reqwest = { version = "0.11", features = [
-    "cookies",
-    "json",
-    "rustls-tls",
-], default-features = false }
 gotify = { version = "0.4.0", features = ["app"] }
