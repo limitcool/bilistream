@@ -116,23 +116,39 @@ jobs:
           cpanm Locale::Maketext::Simple
           cpanm Params::Check
           cpanm IPC::Cmd
+          # 输出环境变量以进行调试
+          Write-Host "Environment variables:"
+          Get-ChildItem Env:
         shell: pwsh
 
       - name: Set OpenSSL and Perl environment variables (Windows)
         if: runner.os == 'Windows'
         run: |
-          echo "OPENSSL_DIR=$env:OPENSSL_DIR" >> $GITHUB_ENV
-          echo "OPENSSL_LIB_DIR=$env:OPENSSL_LIB_DIR" >> $GITHUB_ENV
-          echo "OPENSSL_INCLUDE_DIR=$env:OPENSSL_INCLUDE_DIR" >> $GITHUB_ENV
-          echo "OPENSSL_CONFIG_DIR=$env:OPENSSL_CONFIG_DIR" >> $GITHUB_ENV
-          echo "PERL5LIB=$env:PERL5LIB" >> $GITHUB_ENV
-          echo "OPENSSL_NO_VENDOR=$env:OPENSSL_NO_VENDOR" >> $GITHUB_ENV
-          echo "X86_64_PC_WINDOWS_MSVC_OPENSSL_NO_VENDOR=$env:X86_64_PC_WINDOWS_MSVC_OPENSSL_NO_VENDOR" >> $GITHUB_ENV
-          echo "$env:OPENSSL_DIR\bin" >> $GITHUB_PATH
+          echo "OPENSSL_DIR=${{ env.OPENSSL_DIR }}" >> $GITHUB_ENV
+          echo "OPENSSL_LIB_DIR=${{ env.OPENSSL_LIB_DIR }}" >> $GITHUB_ENV
+          echo "OPENSSL_INCLUDE_DIR=${{ env.OPENSSL_INCLUDE_DIR }}" >> $GITHUB_ENV
+          echo "OPENSSL_CONFIG_DIR=${{ env.OPENSSL_CONFIG_DIR }}" >> $GITHUB_ENV
+          echo "PERL5LIB=${{ env.PERL5LIB }}" >> $GITHUB_ENV
+          echo "OPENSSL_NO_VENDOR=${{ env.OPENSSL_NO_VENDOR }}" >> $GITHUB_ENV
+          echo "X86_64_PC_WINDOWS_MSVC_OPENSSL_NO_VENDOR=${{ env.X86_64_PC_WINDOWS_MSVC_OPENSSL_NO_VENDOR }}" >> $GITHUB_ENV
+          echo "${{ env.OPENSSL_DIR }}\bin" >> $GITHUB_PATH
           echo "C:\Strawberry\perl\bin" >> $GITHUB_PATH
         shell: bash
 
-      - name: Cargo Build
+      - name: Cargo Build (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          Write-Host "Environment variables before build:"
+          Get-ChildItem Env:
+          if ("${{ matrix.target }}") {
+            cargo build --release --target ${{ matrix.target }}
+          } else {
+            cargo build --release
+          }
+        shell: pwsh
+
+      - name: Cargo Build (Non-Windows)
+        if: runner.os != 'Windows'
         run: |
           if [ "${{ runner.os }}" = "Linux" ]; then
             if [ "${{ matrix.target }}" = "aarch64-unknown-linux-gnu" ]; then
