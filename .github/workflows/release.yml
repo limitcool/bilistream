@@ -69,19 +69,9 @@ jobs:
       - name: Install cross (Linux)
         if: runner.os == 'Linux'
         run: cargo install cross
-      - name: Install vcpkg (Windows)
+      - name: Install OpenSSL (Windows)
         if: runner.os == 'Windows'
-        uses: lukka/run-vcpkg@v7
-        with:
-          vcpkgGitCommitId: 'a42af01b72c28a8e1d7b48107b33e4f286a55ef6'
-          vcpkgTriplet: ${{ matrix.target == 'aarch64-pc-windows-msvc' && 'arm64-windows-static' || 'x64-windows-static' }}
-          vcpkgArguments: openssl
-      - name: Set OPENSSL_DIR and OPENSSL_STATIC (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          echo "OPENSSL_DIR=${{ github.workspace }}/vcpkg/installed/${{ matrix.target == 'aarch64-pc-windows-msvc' && 'arm64-windows-static' || 'x64-windows-static' }}" >> $GITHUB_ENV
-          echo "OPENSSL_STATIC=1" >> $GITHUB_ENV
-        shell: bash
+        run: choco upgrade openssl.light
       - name: Cargo Build
         run: |
           if [ "${{ runner.os }}" = "Linux" ]; then
@@ -106,12 +96,20 @@ jobs:
             ls -R target/release
           fi
         shell: bash
+      - name: Prepare asset
+        run: |
+          if [ "${{ matrix.target }}" ]; then
+            cp target/${{ matrix.target }}/release/${{ matrix.artifact_name }} ${{ matrix.artifact_name }}
+          else
+            cp target/release/${{ matrix.artifact_name }} ${{ matrix.artifact_name }}
+          fi
+        shell: bash
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ${{ matrix.target && format('target/{0}/release/{1}', matrix.target, matrix.artifact_name) || format('target/release/{0}', matrix.artifact_name) }}
+          asset_path: ${{ matrix.artifact_name }}
           asset_name: bilistream-${{ needs.create-release.outputs.version }}-${{ matrix.asset_name }}
           asset_content_type: application/octet-stream
