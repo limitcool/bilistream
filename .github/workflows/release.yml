@@ -1,4 +1,4 @@
-name: Rust CI
+name: Release
 
 on:
   push:
@@ -51,9 +51,9 @@ jobs:
       - name: Build
         run: |
           if [ "${{ matrix.use_cross }}" = "true" ]; then
-            cross build --release --target ${{ matrix.target }}
+            cross build --release --target ${{ matrix.target }} --no-default-features --features rustls-tls
           else
-            cargo build --release
+            cargo build --release --no-default-features --features rustls-tls
           fi
         shell: bash
       - name: Create Release
