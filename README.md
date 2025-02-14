@@ -30,24 +30,57 @@ pip3 install -U yt-dlp
 
 ## 使用指南
 
-### Windows
+### 下载和安装
 
-```
-.\bilistream.exe
-```
+根据您的系统选择对应的版本：
 
-### Linux-arm
+#### Windows
+- x64系统: 下载 `bilistream-v{版本号}-x86_64-pc-windows-msvc.zip`
+- ARM64系统: 下载 `bilistream-v{版本号}-aarch64-pc-windows-msvc.zip`
 
-```
-xz -d bilistream-v0.1.11-aarch64-linux.tar.xz
-tar -xvf bilistream-v0.1.11-aarch64-linux.tar
-cd bilistream-v0.1.11-aarch64-linux
+下载后解压，直接运行 `bilistream.exe` 即可。
+
+#### Linux
+- x64系统: 下载 `bilistream-v{版本号}-x86_64-unknown-linux-musl.tar.gz`
+- ARM64系统: 下载 `bilistream-v{版本号}-aarch64-unknown-linux-gnu.tar.gz`
+
+```bash
+# 解压
+tar -xzf bilistream-v{版本号}-{架构}.tar.gz
+cd bilistream-v{版本号}-{架构}
+# 运行
 ./bilistream
 ```
 
-若使用的Linux版本glibc库较旧，可尝试使用Linux-musl版。Linux的编译环境版本为Ubuntu 20.04，低于此版本可尝试使用Linux-musl。
+#### macOS
+- Intel芯片: 下载 `bilistream-v{版本号}-x86_64-apple-darwin.tar.gz`
+- M系列芯片: 下载 `bilistream-v{版本号}-aarch64-apple-darwin.tar.gz`
 
-在解压目录新建 `config.yaml` 文件：
+```bash
+# 解压
+tar -xzf bilistream-v{版本号}-{架构}.tar.gz
+cd bilistream-v{版本号}-{架构}
+# 运行
+./bilistream
+```
+
+### 验证下载
+
+每个发布包都附带了 SHA256 校验和文件（.sha256 后缀），您可以使用它来验证下载的完整性：
+
+```bash
+# Windows (PowerShell)
+Get-FileHash bilistream-v{版本号}-{架构}.zip -Algorithm SHA256
+
+# Linux/macOS
+shasum -a 256 bilistream-v{版本号}-{架构}.tar.gz
+```
+
+将输出的哈希值与对应的 .sha256 文件中的内容进行比对。
+
+### 配置
+
+在程序所在目录新建 `config.yaml` 文件：
 
 ```
 touch config.yaml
