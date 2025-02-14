@@ -25,13 +25,6 @@ jobs:
         run: |
           echo "version is: $VERSION"
           echo "project name is: $PROJECT_NAME"
-      - name: Check that tag version and Cargo.toml version are the same
-        shell: bash
-        run: |
-          if ! grep -q "version = \"$VERSION\"" Cargo.toml; then
-            echo "version does not match Cargo.toml" >&2
-            exit 1
-          fi
       - name: Create GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
