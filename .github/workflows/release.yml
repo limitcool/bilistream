@@ -1,161 +1,95 @@
-name: Release
+name: Rust Cross-Compile
 
 on:
   push:
-    branches: [ main ]
-    tags:
-      - 'v*'
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  create-release:
-    name: Create Release
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-      version: ${{ steps.get_version.outputs.VERSION }}
-    steps:
-      - name: Get version
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-
-  build-and-release:
-    name: Build and Release
-    needs: create-release
-    runs-on: ${{ matrix.os }}
-    if: startsWith(github.ref, 'refs/tags/')
+  build:
+    name: Build for ${{ matrix.platform.os_name }} with Rust ${{ matrix.toolchain }}
+    runs-on: ${{ matrix.platform.os }}
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-            artifact_name: bilistream
-            asset_name: linux-x86_64
-          - os: ubuntu-latest
-            artifact_name: bilistream
-            asset_name: linux-aarch64
+        platform:
+          - os_name: Linux-x86_64
+            os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            bin: go-action-${{ github.event_name == 'push' && github.ref_name || github.run_id }}-linux-x64
+            suffix: tar.gz
+          - os_name: Linux-aarch64
+            os: ubuntu-latest
             target: aarch64-unknown-linux-gnu
-          - os: windows-latest
-            artifact_name: bilistream.exe
-            asset_name: windows-x86_64
-          - os: windows-latest
-            artifact_name: bilistream.exe
-            asset_name: windows-aarch64
+            bin: go-action-${{ github.event_name == 'push' && github.ref_name || github.run_id }}-linux-arm64
+            suffix: tar.gz
+          - os_name: Windows-x86_64
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            bin: go-action-${{ github.event_name == 'push' && github.ref_name || github.run_id }}-windows-x64
+            suffix: zip
+          - os_name: Windows-arm64
+            os: windows-latest
             target: aarch64-pc-windows-msvc
-          - os: macOS-latest
-            artifact_name: bilistream
-            asset_name: macos-x86_64
-          - os: macOS-latest
-            artifact_name: bilistream
-            asset_name: macos-aarch64
+            bin: go-action-${{ github.event_name == 'push' && github.ref_name || github.run_id }}-windows-arm64
+            suffix: zip
+          - os_name: macOS-x86_64
+            os: macos-latest
+            target: x86_64-apple-darwin
+            bin: go-action-${{ github.event_name == 'push' && github.ref_name || github.run_id }}-macos-x64
+            suffix: tar.gz
+          - os_name: macOS-aarch64
+            os: macos-latest
             target: aarch64-apple-darwin
+            bin: go-action-${{ github.event_name == 'push' && github.ref_name || github.run_id }}-macos-arm64
+            suffix: tar.gz
+        toolchain:
+          - stable
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.target }}
-      - name: Install cross (Linux aarch64)
-        if: runner.os == 'Linux' && matrix.target == 'aarch64-unknown-linux-gnu'
-        run: cargo install cross
+          toolchain: ${{ matrix.toolchain }}
+          target: ${{ matrix.platform.target }}
 
-      - name: Cargo Build (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          if ("${{ matrix.target }}") {
-            cargo build --release --target ${{ matrix.target }}
-          } else {
-            cargo build --release
-          }
-        shell: pwsh
+      - name: Setup Cache
+        uses: Swatinem/rust-cache@v2
 
-      - name: Cargo Build (Non-Windows)
-        if: runner.os != 'Windows'
+      - name: Build Binary
+        run: cargo build --locked --release --target ${{ matrix.platform.target }}
+
+      - name: Rename Binary
         run: |
-          if [ "${{ runner.os }}" = "Linux" ]; then
-            if [ "${{ matrix.target }}" = "aarch64-unknown-linux-gnu" ]; then
-              cross build --release --target ${{ matrix.target }}
-            else
-              cargo build --release
-            fi
+          BIN_NAME=${{ matrix.platform.bin }}
+          BIN_SUFFIX=${{ matrix.platform.suffix }}
+          BIN_PATH=target/${{ matrix.platform.target }}/release/${{ github.repository }}
+          mv "$BIN_PATH" "$BIN_NAME"
+
+      - name: Package Binary
+        run: |
+          BIN_NAME=${{ matrix.platform.bin }}
+          BIN_SUFFIX=${{ matrix.platform.suffix }}
+          if [[ "$BIN_SUFFIX" == "zip" ]]; then
+            zip -j "$BIN_NAME.$BIN_SUFFIX" "$BIN_NAME"
           else
-            if [ "${{ matrix.target }}" ]; then
-              cargo build --release --target ${{ matrix.target }}
-            else
-              cargo build --release
-            fi
+            tar -czf "$BIN_NAME.$BIN_SUFFIX" "$BIN_NAME"
           fi
-        shell: bash
 
-      - name: Prepare Release Asset (Windows)
-        if: runner.os == 'Windows'
+      - name: Generate SHA-256 Checksum
         run: |
-          $targetDir = if ("${{ matrix.target }}") { "target/${{ matrix.target }}/release" } else { "target/release" }
-          Copy-Item "$targetDir/bilistream.exe" -Destination "bilistream-${{ needs.create-release.outputs.version }}-${{ matrix.asset_name }}.exe"
-        shell: pwsh
+          BIN_NAME=${{ matrix.platform.bin }}
+          BIN_SUFFIX=${{ matrix.platform.suffix }}
+          shasum -a 256 "$BIN_NAME.$BIN_SUFFIX" | cut -d ' ' -f 1 > "$BIN_NAME.$BIN_SUFFIX.sha256"
 
-      - name: Prepare Release Asset (Non-Windows)
-        if: runner.os != 'Windows'
-        run: |
-          if [ "${{ matrix.target }}" ]; then
-            cp target/${{ matrix.target }}/release/bilistream "bilistream-${{ needs.create-release.outputs.version }}-${{ matrix.asset_name }}"
-          else
-            cp target/release/bilistream "bilistream-${{ needs.create-release.outputs.version }}-${{ matrix.asset_name }}"
-          fi
-        shell: bash
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: bilistream-${{ needs.create-release.outputs.version }}-${{ matrix.asset_name }}${{ runner.os == 'Windows' && '.exe' || '' }}
-          asset_name: bilistream-${{ needs.create-release.outputs.version }}-${{ matrix.asset_name }}${{ runner.os == 'Windows' && '.exe' || '' }}
-          asset_content_type: application/octet-stream
-
-      - name: Build Windows
-        if: matrix.os == 'windows-latest'
-        run: |
-          cargo build --release --target ${{ matrix.target }}
-          cd target/${{ matrix.target }}/release
-          7z a ../../../${{ env.RELEASE_NAME }}-${{ matrix.target }}.zip bilistream.exe
-          cd ../../..
-
-      - name: Build macOS
-        if: matrix.os == 'macos-latest'
-        run: |
-          cargo build --release --target ${{ matrix.target }}
-          cd target/${{ matrix.target }}/release
-          tar -czf ../../../${{ env.RELEASE_NAME }}-${{ matrix.target }}.tar.gz bilistream
-          cd ../../..
-
-      - name: Build Linux
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          cargo build --release --target ${{ matrix.target }}
-          cd target/${{ matrix.target }}/release
-          tar -czf ../../../${{ env.RELEASE_NAME }}-${{ matrix.target }}.tar.gz bilistream
-          cd ../../..
-
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            ${{ env.RELEASE_NAME }}-windows-x86_64.zip
-            ${{ env.RELEASE_NAME }}-windows-aarch64.zip
-            ${{ env.RELEASE_NAME }}-macos-x86_64.tar.gz
-            ${{ env.RELEASE_NAME }}-macos-aarch64.tar.gz
-            ${{ env.RELEASE_NAME }}-linux-x86_64.tar.gz
-            ${{ env.RELEASE_NAME }}-linux-aarch64.tar.gz
+          name: ${{ matrix.platform.bin }}.$(BIN_SUFFIX)
+          path: ${{ matrix.platform.bin }}.$(BIN_SUFFIX)
+          if-no-files-found: ignore
