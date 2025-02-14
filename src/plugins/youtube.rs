@@ -9,6 +9,7 @@ pub struct Youtube {
     pub room: String,
     pub access_token: String,
     pub client: ClientWithMiddleware,
+    pub config: crate::config::Config,
 }
 #[async_trait]
 impl Live for Youtube {
@@ -43,21 +44,35 @@ impl Live for Youtube {
 }
 
 impl Youtube {
-    pub fn new(room: &str, access_token: String, client: ClientWithMiddleware) -> impl Live {
+    pub fn new(
+        room: &str,
+        access_token: String,
+        client: ClientWithMiddleware,
+        config: crate::config::Config,
+    ) -> impl Live {
         Youtube {
             room: room.to_string(),
-            access_token: access_token,
+            access_token,
             client,
+            config,
         }
     }
 
     pub fn ytdlp(&self) -> Result<String, Box<dyn Error>> {
         let mut command = Command::new("yt-dlp");
         command.arg("-g");
+
+        // 如果配置了cookies，添加cookies参数
+        if let Some(cookies) = &self.config.cookies {
+            command.arg("--cookies");
+            command.arg(cookies);
+        }
+
         command.arg(format!(
             "https://www.youtube.com/channel/{}/live",
             self.room.as_str().replace("\"", "")
         ));
+
         match command.status().unwrap().code() {
             Some(code) => {
                 if code == 0 {

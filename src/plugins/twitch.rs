@@ -5,12 +5,14 @@ use reqwest_middleware::ClientWithMiddleware;
 use serde_json::json;
 use std::error::Error;
 use urlencoding::encode;
+use std::process::Command;
 
 use super::Live;
 
 pub struct Twitch {
     pub room: String,
     pub client: ClientWithMiddleware,
+    pub config: crate::config::Config,
 }
 
 struct Token {
@@ -89,10 +91,11 @@ impl Live for Twitch {
 }
 
 impl Twitch {
-    pub fn new(room: &str, client: ClientWithMiddleware) -> impl Live {
+    pub fn new(room: &str, client: ClientWithMiddleware, config: crate::config::Config) -> impl Live {
         return Twitch {
             room: room.to_string(),
             client: client,
+            config: config,
         };
     }
     async fn get_m3u8_url(&self, token: Token) -> Result<String, Box<dyn Error>> {
@@ -109,27 +112,26 @@ impl Twitch {
     }
 
     pub fn ytdlp(&self) -> Result<String, Box<dyn Error>> {
-        let mut command = std::process::Command::new("yt-dlp");
+        let mut command = Command::new("yt-dlp");
         command.arg("-g");
-        command.arg(format!(
-            "https://www.twitch.tv/{}",
-            self.room.as_str().replace("\"", "")
-        ));
-        match command.status().unwrap().code() {
-            Some(code) => {
-                if code == 0 {
-                    let res = command.output().unwrap();
-                    let res = String::from_utf8(res.stdout).unwrap();
-                    Ok(self.replace_url(res.as_str()))
-                } else {
-                    Err(Box::new(std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        "yt-dlp error",
-                    )))
-                }
-            }
-            None => Err("yt-dlp error".into()),
+
+        // 如果配置了cookies，添加cookies参数
+        if let Some(cookies) = &self.config.cookies {
+            command.arg("--cookies");
+            command.arg(cookies);
         }
+
+        command.arg(format!("https://www.twitch.tv/{}", self.room));
+
+        let output = command.output()?;
+        let stdout = String::from_utf8(output.stdout)?;
+        let urls: Vec<&str> = stdout.trim().split('\n').collect();
+
+        if urls.is_empty() {
+            return Err("No URL found".into());
+        }
+
+        Ok(urls[0].to_string())
     }
 
     fn replace_url(&self, content: &str) -> String {

@@ -42,12 +42,14 @@ pub async fn select_live(cfg: Config) -> Result<Box<dyn Live>, Box<dyn Error>> {
     match cfg.platform.as_str() {
         "Youtube" => Ok(Box::new(Youtube::new(
             cfg.youtube.room.as_str(),
-            cfg.youtube.access_token,
+            cfg.youtube.access_token.clone(),
             client.clone(),
+            cfg.clone(),
         ))),
         "Twitch" => Ok(Box::new(Twitch::new(
             cfg.twitch.room.as_str(),
             client.clone(),
+            cfg.clone(),
         ))),
         "YoutubePreviewLive" => {
             let room_id = get_live_id_by_jump(cfg.youtube_preview_live.channel_id.as_str())
@@ -55,8 +57,9 @@ pub async fn select_live(cfg: Config) -> Result<Box<dyn Live>, Box<dyn Error>> {
                 .unwrap();
             Ok(Box::new(Youtube::new(
                 room_id.as_str(),
-                cfg.youtube.access_token,
+                cfg.youtube.access_token.clone(),
                 client.clone(),
+                cfg.clone(),
             )))
         }
         _ => Err("unknown platform".into()),

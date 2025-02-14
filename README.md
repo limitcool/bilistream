@@ -93,6 +93,10 @@ FfmpegProxy: http://127.0.0.1:7890
 Gotify:
   url: "https://example.com/gotify"
   token: "your_gotify_token_here"
+
+### Cookies配置 (可选)
+# 如果需要转播会员限定或需要登录的内容，可以配置cookies
+Cookies: "/path/to/cookies.txt"  # cookies文件路径，支持YouTube和Twitch
 ```
 
 ## Youtube API申请地址
@@ -105,3 +109,5 @@ https://developers.google.com/youtube/v3
   - A: 可能是BiliRtmpUrl及BiliRtmpKey填写错误或使用海外机器进行推流。B站不支持海外机器推流，建议使用国内服务器+代理推流。
 - Q: 转播Youtube时出现Connection to tcp://manifest.googlevideo.com:443 failed: Error number -138 occurred
   - A: 可能是Ffmpeg拉流未通过代理，请在配置项填写 FfmpegProxy: [http://127.0.0.1:7890。](http://127.0.0.1:7890。/)
+- Q: 如何获取cookies文件？
+  - A: 可以使用浏览器扩展（如Get cookies.txt）导出Netscape格式的cookies文件。对于YouTube和Twitch，需要先在浏览器中登录账号，然后导出cookies。

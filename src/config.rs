@@ -22,6 +22,8 @@ pub struct Config {
     pub ffmpeg_proxy: Option<String>,
     #[serde(rename = "Gotify")]
     pub gotify: Option<GotifyConfig>,
+    #[serde(rename = "Cookies")]
+    pub cookies: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
