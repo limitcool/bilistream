@@ -129,10 +129,10 @@ jobs:
           fi
           echo "BIN=$bin" >> $GITHUB_ENV
 
-      - name: Strip release binary (macos)
-        if: matrix.os == 'macos-latest'
-        shell: bash
-        run: strip "$BIN"
+      # - name: Strip release binary (macos)
+      #   if: matrix.os == 'macos-latest'
+      #   shell: bash
+      #   run: strip "$BIN"
 
       - name: Strip release binary (cross)
         if: env.CARGO == 'cross'
