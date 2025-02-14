@@ -127,3 +127,38 @@ jobs:
           asset_path: ${{ matrix.artifact_name }}
           asset_name: bilistream-${{ needs.create-release.outputs.version }}-${{ matrix.asset_name }}
           asset_content_type: application/octet-stream
+
+      - name: Build Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          cargo build --release --target ${{ matrix.target }}
+          cd target/${{ matrix.target }}/release
+          7z a ../../../${{ env.RELEASE_NAME }}-${{ matrix.target }}.zip bilistream.exe
+          cd ../../..
+
+      - name: Build macOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          cargo build --release --target ${{ matrix.target }}
+          cd target/${{ matrix.target }}/release
+          tar -czf ../../../${{ env.RELEASE_NAME }}-${{ matrix.target }}.tar.gz bilistream
+          cd ../../..
+
+      - name: Build Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          cargo build --release --target ${{ matrix.target }}
+          cd target/${{ matrix.target }}/release
+          tar -czf ../../../${{ env.RELEASE_NAME }}-${{ matrix.target }}.tar.gz bilistream
+          cd ../../..
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ${{ env.RELEASE_NAME }}-windows-x86_64.zip
+            ${{ env.RELEASE_NAME }}-windows-aarch64.zip
+            ${{ env.RELEASE_NAME }}-macos-x86_64.tar.gz
+            ${{ env.RELEASE_NAME }}-macos-aarch64.tar.gz
+            ${{ env.RELEASE_NAME }}-linux-x86_64.tar.gz
+            ${{ env.RELEASE_NAME }}-linux-aarch64.tar.gz
