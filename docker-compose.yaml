@@ -1,0 +1,15 @@
+services:
+  bilistream:
+    image: ghcr.io/limitcool/bilistream:v0.1.12
+    container_name: bilistream
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro  # 挂载配置文件（只读）
+      - ./cookies.txt:/app/cookies.txt:ro   # 可选：挂载 cookies 文件（只读）
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai    # 设置时区
+    # 如果需要使用代理，取消下面的注释并修改地址
+    # network_mode: "host"  # 如果使用本地代理，可能需要 host 网络模式
+    # environment:
+    #   - http_proxy=http://host.docker.internal:7890
+    #   - https_proxy=http://host.docker.internal:7890

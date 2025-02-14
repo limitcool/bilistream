@@ -1,0 +1,33 @@
+# 构建阶段
+FROM rust:alpine AS builder
+
+# 安装构建依赖
+RUN apk add --no-cache \
+    musl-dev \
+    pkgconfig
+
+# 设置工作目录
+WORKDIR /usr/src/bilistream
+
+# 复制项目文件
+COPY . .
+
+# 构建项目并设置权限
+RUN cargo build --release && \
+    strip target/release/bilistream && \
+    chmod +x target/release/bilistream
+
+# 最终运行阶段
+FROM ghcr.io/jim60105/yt-dlp:latest
+
+# 清除默认的 ENTRYPOINT
+ENTRYPOINT []
+
+# 设置工作目录
+WORKDIR /app
+
+# 从构建阶段复制二进制文件
+COPY --from=builder /usr/src/bilistream/target/release/bilistream /app/
+
+# 设置容器启动命令
+CMD ["/app/bilistream"]

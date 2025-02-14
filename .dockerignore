@@ -1,0 +1,8 @@
+target/
+.git/
+.github/
+.gitignore
+Dockerfile
+README.md
+config.yaml
+cookies.txt

@@ -1,4 +1,3 @@
-```
  _     _ _ _     _
 | |__ (_) (_)___| |_ _ __ ___  __ _ _ __ ___
 | '_ \| | | / __| __| '__/ _ \/ _` | '_ ` _ \
@@ -13,18 +12,80 @@ bilistream是一个支持无人值守自动转播Twitch和Youtube（包括预告
 
 ### QQ群: 715748617
 
+## 使用指南
+
+### Docker 部署（推荐）
+
+推荐使用 Docker 来部署 bilistream，这是最简单和稳定的方式：
+
+1. 安装 Docker 和 Docker Compose：
+   - Windows/Mac: 安装 [Docker Desktop](https://www.docker.com/products/docker-desktop)
+   - Linux: 参考 [Docker 安装指南](https://docs.docker.com/engine/install/)
+
+2. 创建 docker-compose.yaml 文件：
+```yaml
+services:
+  bilistream:
+    image: ghcr.io/limitcool/bilistream:v0.1.12
+    container_name: bilistream
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro  # 挂载配置文件（只读）
+      - ./cookies.txt:/app/cookies.txt:ro   # 可选：挂载 cookies 文件（只读）
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai    # 设置时区
+```
+
+3. 创建配置文件：
 ```bash
-# Debian
+# 创建配置文件
+touch config.yaml
+```
+
+4. 编辑 config.yaml 文件（配置示例见下文）
+
+5. 启动服务：
+```bash
+docker-compose up -d
+```
+
+6. 查看运行状态：
+```bash
+# 查看日志
+docker-compose logs -f
+
+# 查看容器状态
+docker-compose ps
+```
+
+7. 停止服务：
+```bash
+docker-compose down
+```
+
+注意事项：
+- 确保配置文件中的路径使用容器内的路径（如 cookies 文件路径应该是 `/app/cookies.txt`）
+- 如果需要使用代理，在 docker-compose.yaml 中添加：
+```yaml
+    network_mode: "host"  # 如果使用本地代理
+    environment:
+      - http_proxy=http://host.docker.internal:7890
+      - https_proxy=http://host.docker.internal:7890
+```
+
+### 二进制部署
+
+如果您不想使用 Docker，也可以直接下载二进制文件运行。首先需要安装以下依赖：
+
+```bash
+# Debian/Ubuntu
 apt update
-# 安装ffmpeg。
-apt install ffmpeg -y
-apt install python3-pip -y # 部分机器可能还需要此操作。
+apt install ffmpeg python3-pip -y
+
 # CentOS
-# 安装ffmpeg。
 yum install ffmpeg -y
-# 如需转播Youtube，需单独安装Yt-dlp。
-pip3 install yt-dlp
-# 更新yt-dlp至最新版。
+
+# 安装 yt-dlp
 pip3 install -U yt-dlp
 ```
 
