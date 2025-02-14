@@ -73,8 +73,6 @@ jobs:
       - name: Cargo Build (Windows)
         if: runner.os == 'Windows'
         run: |
-          Write-Host "Environment variables before build:"
-          Get-ChildItem Env:
           if ("${{ matrix.target }}") {
             cargo build --release --target ${{ matrix.target }}
           } else {
@@ -100,21 +98,20 @@ jobs:
           fi
         shell: bash
 
-      - name: List target directory
+      - name: Prepare Release Asset (Windows)
+        if: runner.os == 'Windows'
         run: |
-          if [ "${{ matrix.target }}" ]; then
-            ls -R target/${{ matrix.target }}/release
-          else
-            ls -R target/release
-          fi
-        shell: bash
+          $targetDir = if ("${{ matrix.target }}") { "target/${{ matrix.target }}/release" } else { "target/release" }
+          Copy-Item "$targetDir/bilistream.exe" -Destination "bilistream-${{ needs.create-release.outputs.version }}-${{ matrix.asset_name }}.exe"
+        shell: pwsh
 
-      - name: Prepare asset
+      - name: Prepare Release Asset (Non-Windows)
+        if: runner.os != 'Windows'
         run: |
           if [ "${{ matrix.target }}" ]; then
-            cp target/${{ matrix.target }}/release/${{ matrix.artifact_name }} ${{ matrix.artifact_name }}
+            cp target/${{ matrix.target }}/release/bilistream "bilistream-${{ needs.create-release.outputs.version }}-${{ matrix.asset_name }}"
           else
-            cp target/release/${{ matrix.artifact_name }} ${{ matrix.artifact_name }}
+            cp target/release/bilistream "bilistream-${{ needs.create-release.outputs.version }}-${{ matrix.asset_name }}"
           fi
         shell: bash
 
@@ -124,8 +121,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ${{ matrix.artifact_name }}
-          asset_name: bilistream-${{ needs.create-release.outputs.version }}-${{ matrix.asset_name }}
+          asset_path: bilistream-${{ needs.create-release.outputs.version }}-${{ matrix.asset_name }}${{ runner.os == 'Windows' && '.exe' || '' }}
+          asset_name: bilistream-${{ needs.create-release.outputs.version }}-${{ matrix.asset_name }}${{ runner.os == 'Windows' && '.exe' || '' }}
           asset_content_type: application/octet-stream
 
       - name: Build Windows
