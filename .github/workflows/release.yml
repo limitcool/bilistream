@@ -10,6 +10,9 @@ on:
 permissions:
   contents: write
 
+env:
+  BINARY_NAME: bilistream  # 定义二进制文件名称为环境变量
+
 jobs:
   create-release:
     name: create-release
@@ -20,7 +23,10 @@ jobs:
         if: env.VERSION == ''
         run: echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
       - name: Get project name from repository name
-        run: echo "PROJECT_NAME=${{ github.repository }}" >> $GITHUB_ENV
+        run: |
+          repository="${{ github.repository }}"
+          project_name="${repository##*/}"  # 只获取仓库名，去掉所有者部分
+          echo "PROJECT_NAME=$project_name" >> $GITHUB_ENV
       - name: Show the version and project name
         run: |
           echo "version is: $VERSION"
@@ -123,11 +129,22 @@ jobs:
         run: |
           ${{ env.CARGO }} build --verbose --release ${{ env.TARGET_FLAGS }}
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            bin="target/${{ matrix.target }}/release/${{ needs.create-release.outputs.project_name }}.exe"
+            bin="target/${{ matrix.target }}/release/${{ env.BINARY_NAME }}.exe"
           else
-            bin="target/${{ matrix.target }}/release/${{ needs.create-release.outputs.project_name }}"
+            bin="target/${{ matrix.target }}/release/${{ env.BINARY_NAME }}"
           fi
           echo "BIN=$bin" >> $GITHUB_ENV
+
+          # 添加调试信息
+          echo "=== Build Debug Info ==="
+          echo "Binary path: $bin"
+          echo "Target directory content:"
+          if [ "${{ matrix.target }}" ]; then
+            ls -la target/${{ matrix.target }}/release/
+          else
+            ls -la target/release/
+          fi
+          echo "======================="
 
       # - name: Strip release binary (macos)
       #   if: matrix.os == 'macos-latest'
@@ -142,14 +159,13 @@ jobs:
             "$PWD/target:/target:Z" \
             "ghcr.io/cross-rs/${{ matrix.target }}:main" \
             "${{ matrix.strip }}" \
-            "/$BIN"
+            "/target/${{ matrix.target }}/release/${{ env.BINARY_NAME }}"
 
       - name: Determine archive name
         shell: bash
         run: |
           version="${{ needs.create-release.outputs.version }}"
-          project_name="${{ needs.create-release.outputs.project_name }}"
-          echo "ARCHIVE=$project_name-$version-${{ matrix.target }}" >> $GITHUB_ENV
+          echo "ARCHIVE=${{ env.BINARY_NAME }}-$version-${{ matrix.target }}" >> $GITHUB_ENV
 
       - name: Creating directory for archive
         shell: bash
