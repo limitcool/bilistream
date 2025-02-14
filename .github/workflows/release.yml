@@ -1,4 +1,4 @@
-name: Rust Cross-Compile
+name: Rust Cross-Compile and Release
 
 on:
   push:
@@ -7,89 +7,104 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  CRATE_NAME: bilistream
+  VERSION: v0.1.12 
+
 jobs:
-  build:
-    name: Build for ${{ matrix.platform.os_name }} with Rust ${{ matrix.toolchain }}
-    runs-on: ${{ matrix.platform.os }}
+  build-and-release:
+    name: Build for ${{ matrix.platform.os }}-${{ matrix.platform.arch }}
+    runs-on: ${{ matrix.platform.runs-on }}
     strategy:
       fail-fast: false
       matrix:
         platform:
-          - os_name: Linux-x86_64
-            os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            bin: go-action-${{ github.event_name == 'push' && github.ref_name || github.run_id }}-linux-x64
-            suffix: tar.gz
-          - os_name: Linux-aarch64
-            os: ubuntu-latest
+          - os: Linux
+            arch: arm64
             target: aarch64-unknown-linux-gnu
-            bin: go-action-${{ github.event_name == 'push' && github.ref_name || github.run_id }}-linux-arm64
+            runs-on: ubuntu-latest
             suffix: tar.gz
-          - os_name: Windows-x86_64
-            os: windows-latest
-            target: x86_64-pc-windows-msvc
-            bin: go-action-${{ github.event_name == 'push' && github.ref_name || github.run_id }}-windows-x64
-            suffix: zip
-          - os_name: Windows-arm64
-            os: windows-latest
+          - os: Linux
+            arch: x64
+            target: x86_64-unknown-linux-gnu
+            runs-on: ubuntu-latest
+            suffix: tar.gz
+          - os: Windows
+            arch: arm64
             target: aarch64-pc-windows-msvc
-            bin: go-action-${{ github.event_name == 'push' && github.ref_name || github.run_id }}-windows-arm64
+            runs-on: windows-latest
             suffix: zip
-          - os_name: macOS-x86_64
-            os: macos-latest
-            target: x86_64-apple-darwin
-            bin: go-action-${{ github.event_name == 'push' && github.ref_name || github.run_id }}-macos-x64
-            suffix: tar.gz
-          - os_name: macOS-aarch64
-            os: macos-latest
+          - os: Windows
+            arch: x64
+            target: x86_64-pc-windows-msvc
+            runs-on: windows-latest
+            suffix: zip
+          - os: macOS
+            arch: arm64
             target: aarch64-apple-darwin
-            bin: go-action-${{ github.event_name == 'push' && github.ref_name || github.run_id }}-macos-arm64
+            runs-on: macos-latest
             suffix: tar.gz
-        toolchain:
-          - stable
+          - os: macOS
+            arch: x64
+            target: x86_64-apple-darwin
+            runs-on: macos-latest
+            suffix: tar.gz
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install Cross-Compile Tools (Linux)
+        if: matrix.platform.runs-on == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gcc-aarch64-linux-gnu \
+            g++-aarch64-linux-gnu \
+            gcc-x86-64-linux-gnu \
+            g++-x86-64-linux-gnu \
+            gcc-arm-linux-gnueabihf \
+            g++-arm-linux-gnueabihf \
+            gcc-riscv64-linux-gnu \
+            g++-riscv64-linux-gnu \
+            gcc-s390x-linux-gnu \
+            g++-s390x-linux-gnu \
+            gcc-powerpc-linux-gnu \
+            g++-powerpc-linux-gnu \
+            gcc-powerpc64-linux-gnu \
+            g++-powerpc64-linux-gnu \
+            gcc-powerpc64le-linux-gnu \
+            g++-powerpc64le-linux-gnu [^5^]
+
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: ${{ matrix.toolchain }}
+          toolchain: stable
           target: ${{ matrix.platform.target }}
 
-      - name: Setup Cache
-        uses: Swatinem/rust-cache@v2
-
       - name: Build Binary
-        run: cargo build --locked --release --target ${{ matrix.platform.target }}
-
-      - name: Rename Binary
         run: |
-          BIN_NAME=${{ matrix.platform.bin }}
-          BIN_SUFFIX=${{ matrix.platform.suffix }}
-          BIN_PATH=target/${{ matrix.platform.target }}/release/${{ github.repository }}
-          mv "$BIN_PATH" "$BIN_NAME"
+          cargo build --locked --release --target ${{ matrix.platform.target }}
+          mkdir -p release
+          mv target/${{ matrix.platform.target }}/release/${{ env.CRATE_NAME }} release/
 
       - name: Package Binary
         run: |
-          BIN_NAME=${{ matrix.platform.bin }}
-          BIN_SUFFIX=${{ matrix.platform.suffix }}
-          if [[ "$BIN_SUFFIX" == "zip" ]]; then
-            zip -j "$BIN_NAME.$BIN_SUFFIX" "$BIN_NAME"
+          ARTIFACT_NAME="${{ env.CRATE_NAME }}-${{ env.VERSION }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}"
+          if [[ "${{ matrix.platform.suffix }}" == "zip" ]]; then
+            zip -j release/${ARTIFACT_NAME}.zip release/${{ env.CRATE_NAME }}
           else
-            tar -czf "$BIN_NAME.$BIN_SUFFIX" "$BIN_NAME"
+            tar -czf release/${ARTIFACT_NAME}.tar.gz release/${{ env.CRATE_NAME }}
           fi
 
       - name: Generate SHA-256 Checksum
         run: |
-          BIN_NAME=${{ matrix.platform.bin }}
-          BIN_SUFFIX=${{ matrix.platform.suffix }}
-          shasum -a 256 "$BIN_NAME.$BIN_SUFFIX" | cut -d ' ' -f 1 > "$BIN_NAME.$BIN_SUFFIX.sha256"
+          ARTIFACT_NAME="${{ env.CRATE_NAME }}-${{ env.VERSION }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}"
+          shasum -a 256 release/${ARTIFACT_NAME}.${{ matrix.platform.suffix }} | cut -d ' ' -f 1 > release/${ARTIFACT_NAME}.${{ matrix.platform.suffix }}.sha256
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.platform.bin }}.$(BIN_SUFFIX)
-          path: ${{ matrix.platform.bin }}.$(BIN_SUFFIX)
+          name: ${{ env.CRATE_NAME }}-${{ env.VERSION }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}.${{ matrix.platform.suffix }}
+          path: release/${{ env.CRATE_NAME }}-${{ env.VERSION }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}.${{ matrix.platform.suffix }}
           if-no-files-found: ignore
