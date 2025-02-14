@@ -63,10 +63,18 @@ jobs:
             os: macos-latest
             rust: nightly
             target: x86_64-apple-darwin
+          - build: macos-arm64
+            os: macos-latest
+            rust: nightly
+            target: aarch64-apple-darwin
           - build: win-msvc
             os: windows-latest
             rust: nightly
             target: x86_64-pc-windows-msvc
+          - build: win-arm64
+            os: windows-latest
+            rust: nightly
+            target: aarch64-pc-windows-msvc
 
     steps:
       - name: Checkout repository
@@ -113,7 +121,7 @@ jobs:
       - name: Build release binary
         shell: bash
         run: |
-          ${{ env.CARGO }} build --verbose --release --features pcre2 ${{ env.TARGET_FLAGS }}
+          ${{ env.CARGO }} build --verbose --release ${{ env.TARGET_FLAGS }}
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
             bin="target/${{ matrix.target }}/release/${{ needs.create-release.outputs.project_name }}.exe"
           else
