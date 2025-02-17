@@ -27,7 +27,7 @@ bilistream是一个支持无人值守自动转播Twitch和Youtube（包括预告
 ```yaml
 services:
   bilistream:
-    image: ghcr.io/limitcool/bilistream:v0.1.12
+    image: ghcr.io/limitcool/bilistream:latest
     container_name: bilistream
     volumes:
       - ./config.yaml:/app/config.yaml:ro  # 挂载配置文件（只读）
