@@ -1,208 +1,178 @@
-```
-| |__ (_) (_)___| |_ _ __ ___  __ _ _ __ ___
-| '_ \| | | / __| __| '__/ _ \/ _` | '_ ` _ \
-| |_) | | | \__ \ |_| | |  __/ (_| | | | | | |
-|_.__/|_|_|_|___/\__|_|  \___|\__,_|_| |_| |_|
-```
-
-
-
 # bilistream
 
-bilistream是一个支持无人值守自动转播Twitch和Youtube（包括预告类型直播）的B站直播自动转播工具。
+`bilistream` 是一个面向 self-host 场景的 B 站自动转播工具，用于无人值守地监控 Twitch、YouTube、YouTube 预告直播，并在源站开播时自动推流到 B 站。
 
-### QQ群: 715748617
+当前版本：`v0.2.0`
 
-## 使用指南
+## 功能概览
 
-### Docker 部署（推荐）
+- 自动监控 `Twitch`、`YouTube`、`YouTubePreviewLive`
+- 源站开播后自动启动 FFmpeg 推流到 B 站
+- 源站下播后自动结束 B 站直播
+- 支持 `Gotify`、`ntfy`、`both` 三种通知策略
+- 支持通知总开关、Gotify 单独开关、ntfy 单独开关
+- 内置 Web 控制台，支持远程访问、配置编辑、状态查看、日志查看
+- 所有配置统一写入 `config.yaml`，不依赖环境变量
 
-推荐使用 Docker 来部署 bilistream，这是最简单和稳定的方式：
+## 运行依赖
 
-1. 安装 Docker 和 Docker Compose：
-   - Windows/Mac: 安装 [Docker Desktop](https://www.docker.com/products/docker-desktop)
-   - Linux: 参考 [Docker 安装指南](https://docs.docker.com/engine/install/)
+二进制运行模式下需要：
 
-2. 创建 docker-compose.yaml 文件：
+- `ffmpeg`
+- `python3`
+- `yt-dlp`
+
+Docker 镜像已内置这些依赖。
+
+## Docker 部署
+
+推荐直接使用 Docker：
+
 ```yaml
 services:
   bilistream:
-    image: ghcr.io/limitcool/bilistream:latest
+    image: ghcr.io/limitcool/bilistream:v0.2.0
     container_name: bilistream
-    volumes:
-      - ./config.yaml:/app/config.yaml:ro  # 挂载配置文件（只读）
-      - ./cookies.txt:/app/cookies.txt:ro   # 可选：挂载 cookies 文件（只读）
     restart: unless-stopped
-    environment:
-      - TZ=Asia/Shanghai    # 设置时区
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config.yaml:/app/config.yaml
+      - ./cookies.txt:/app/cookies.txt:ro
 ```
 
-3. 创建配置文件：
-```bash
-# 创建配置文件
-touch config.yaml
-```
-
-4. 编辑 config.yaml 文件（配置示例见下文）
-
-5. 启动服务：
-```bash
-docker-compose up -d
-```
-
-6. 查看运行状态：
-```bash
-# 查看日志
-docker-compose logs -f
-
-# 查看容器状态
-docker-compose ps
-```
-
-7. 停止服务：
-```bash
-docker-compose down
-```
-
-注意事项：
-- 确保配置文件中的路径使用容器内的路径（如 cookies 文件路径应该是 `/app/cookies.txt`）
-- 如果需要使用代理，在 docker-compose.yaml 中添加：
-```yaml
-    network_mode: "host"  # 如果使用本地代理
-    environment:
-      - http_proxy=http://host.docker.internal:7890
-      - https_proxy=http://host.docker.internal:7890
-```
-
-### 二进制部署
-
-如果您不想使用 Docker，也可以直接下载二进制文件运行。首先需要安装以下依赖：
+启动：
 
 ```bash
-# Debian/Ubuntu
+docker compose up -d
+```
+
+查看日志：
+
+```bash
+docker compose logs -f
+```
+
+说明：
+
+- Web 控制台默认监听 `0.0.0.0:9090`
+- 程序会直接读写 `/app/config.yaml`，因此 `config.yaml` 不要挂成只读
+- `cookies.txt` 可选，仅在需要登录态拉流时挂载
+
+## 二进制运行
+
+Linux 示例：
+
+```bash
+./bilistream
+```
+
+如未安装依赖，可先安装：
+
+```bash
 apt update
-apt install ffmpeg python3-pip -y
-
-# CentOS
-yum install ffmpeg -y
-
-# 安装 yt-dlp
+apt install -y ffmpeg python3 python3-pip
 pip3 install -U yt-dlp
 ```
 
-## 使用指南
+## 配置方式
 
-### 下载和安装
+程序使用统一的 `config.yaml`。
 
-根据您的系统选择对应的版本：
+如果启动时未检测到 `config.yaml`：
 
-#### Windows
-- x64系统: 下载 `bilistream-v{版本号}-x86_64-pc-windows-msvc.zip`
-- ARM64系统: 下载 `bilistream-v{版本号}-aarch64-pc-windows-msvc.zip`
+- 程序会自动初始化一份默认配置
+- 如果 `WebConsole.Addr` 是公网监听地址且密码为空，会自动生成一个随机密码写回配置
+- 启动日志会提示已自动生成密码，但不会把密码明文打到日志里
 
-下载后解压，直接运行 `bilistream.exe` 即可。
+示例：
 
-#### Linux
-- x64系统: 下载 `bilistream-v{版本号}-x86_64-unknown-linux-musl.tar.gz`
-- ARM64系统: 下载 `bilistream-v{版本号}-aarch64-unknown-linux-gnu.tar.gz`
-
-```bash
-# 解压
-tar -xzf bilistream-v{版本号}-{架构}.tar.gz
-cd bilistream-v{版本号}-{架构}
-# 运行
-./bilistream
-```
-
-#### macOS
-- Intel芯片: 下载 `bilistream-v{版本号}-x86_64-apple-darwin.tar.gz`
-- M系列芯片: 下载 `bilistream-v{版本号}-aarch64-apple-darwin.tar.gz`
-
-```bash
-# 解压
-tar -xzf bilistream-v{版本号}-{架构}.tar.gz
-cd bilistream-v{版本号}-{架构}
-# 运行
-./bilistream
-```
-
-### 验证下载
-
-每个发布包都附带了 SHA256 校验和文件（.sha256 后缀），您可以使用它来验证下载的完整性：
-
-```bash
-# Windows (PowerShell)
-Get-FileHash bilistream-v{版本号}-{架构}.zip -Algorithm SHA256
-
-# Linux/macOS
-shasum -a 256 bilistream-v{版本号}-{架构}.tar.gz
-```
-
-将输出的哈希值与对应的 .sha256 文件中的内容进行比对。
-
-### 配置
-
-在程序所在目录新建 `config.yaml` 文件：
-
-```
-touch config.yaml
-```
-
-将以下内容填写至 `config.yaml` 文件内：
-
-
-``` yaml
-# 检测直播间隔
+```yaml
 Interval: 60
-# 需要转播的平台 Twitch || Youtube || YoutubePreviewLive
 Platform: Twitch
-# B站推流账号Cookie
+
 BiliLive:
-  SESSDATA:
-  bili_jct:
-  DedeUserID: 2235894
-  DedeUserID__ckMd5:
-  Room: 660428
-  BiliRtmpUrl: rtmp://live-push.bilivideo.com/live-bvc/
-  # BiliRtmpUrl: B站开播设置页面的服务器地址
-  BiliRtmpKey: "?streamname=live_0000000_0000000&key=xxxxxxxxxxb8289c6acc97xxxxxxxxx&schedule=rtmp&pflag=1"
-  # BiliRtmpKey: B站开播设置页面的串流密钥,需注意,由于是?号开头的,本行需要对内容加双引号
-# Twitch 直播间Id
+  SESSDATA: ""
+  bili_jct: ""
+  DedeUserID: ""
+  DedeUserID__ckMd5: ""
+  Room: 0
+  BiliRtmpUrl: "rtmp://live-push.bilivideo.com/live-bvc/"
+  BiliRtmpKey: ""
+
 Twitch:
-  # Room: maximilian_dood
-  Room:
-# youtube 需要使用Youtube API AK以及Yt-dlp
+  Room: ""
+
 Youtube:
-  Room: UC1zFJrfEKvCixhsjNSb1toQ
-  AccessToken:
-# youtube 预告类型直播转播请填写以下内容
+  Room: ""
+  AccessToken: ""
+
 YoutubePreviewLive:
-  ChannelId: UC1zFJrfEKvCixhsjNSb1toQ
-FfmpegProxy: http://127.0.0.1:7890
-# Ffmpeg代理地址,无需代理可以不填此项或者留空
+  ChannelId: ""
 
-### Gotify推送配置 (可选)
+FfmpegProxy: ""
+Cookies: ""
 
-# 如果您想使用Gotify进行推送通知,请在`config.yaml`中添加以下配置:
+Notification:
+  Enabled: true
+  Channel: gotify
+  GotifyEnabled: true
+  NtfyEnabled: false
 
 Gotify:
-  url: "https://example.com/gotify"
-  token: "your_gotify_token_here"
+  Url: ""
+  Token: ""
 
-### Cookies配置 (可选)
-# 如果需要转播会员限定或需要登录的内容，可以配置cookies
-Cookies: "/path/to/cookies.txt"  # cookies文件路径，支持YouTube和Twitch
+Ntfy:
+  Url: "https://ntfy.sh"
+  Topic: ""
+  Token: ""
+  Username: ""
+  Password: ""
+  Priority: ""
+  Tags: ""
+
+WebConsole:
+  Addr: "0.0.0.0:9090"
+  Username: "admin"
+  Password: ""
 ```
 
-## Youtube API申请地址
+## Web 控制台
 
-https://developers.google.com/youtube/v3
+Web 控制台支持：
 
-## 常见问题FAQ
+- 查看源站状态、B 站状态、FFmpeg 状态、通知状态
+- 远程启动监控、停止监控、重载配置
+- 在线编辑 `config.yaml`
+- 查看最近运行日志
+- 展示当前版本号与 GitHub 仓库入口
 
-- Q: 转播时出现 Input/output error
-  - A: 可能是BiliRtmpUrl及BiliRtmpKey填写错误或使用海外机器进行推流。B站不支持海外机器推流，建议使用国内服务器+代理推流。
-- Q: 转播Youtube时出现Connection to tcp://manifest.googlevideo.com:443 failed: Error number -138 occurred
-  - A: 可能是Ffmpeg拉流未通过代理，请在配置项填写 FfmpegProxy: [http://127.0.0.1:7890。](http://127.0.0.1:7890。/)
-- Q: 如何获取cookies文件？
-  - A: 可以使用浏览器扩展（如Get cookies.txt）导出Netscape格式的cookies文件。对于YouTube和Twitch，需要先在浏览器中登录账号，然后导出cookies。
+更多说明见 [WEB_CONSOLE.md](./WEB_CONSOLE.md)。
+
+## 通知策略
+
+`Notification.Channel` 支持：
+
+- `gotify`
+- `ntfy`
+- `both`
+
+同时还支持：
+
+- `Notification.Enabled`：通知总开关
+- `Notification.GotifyEnabled`：Gotify 单独开关
+- `Notification.NtfyEnabled`：ntfy 单独开关
+
+也就是说，主策略和单通道开关可以同时生效。
+
+## 发布说明
+
+- GitHub Release 工作流仍然会继续构建 Rust 二进制包
+- Dockerfile 已经升级为先构建前端，再把 `web/out` 一起打进镜像
+- 如果只是发布 Docker 镜像或本地部署，当前 Dockerfile 已经匹配 `v0.2.0` 的前端方案
+- 如果后续希望 GitHub Actions 额外做前端单独校验，可以再补 CI，但不是这次上线的阻塞项
+
+## 仓库地址
+
+GitHub: <https://github.com/limitcool/bilistream>

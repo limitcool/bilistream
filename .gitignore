@@ -6,3 +6,7 @@ jump.html
 jump_live_id.json
 package-lock.json
 update_tag.bat
+web/out
+web/.next
+web/node_modules
+.codex-template/

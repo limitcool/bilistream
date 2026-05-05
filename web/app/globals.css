@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 44% 8%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 44% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 44% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 188 94% 43%;
+    --primary-foreground: 222 47% 11%;
+
+    --secondary: 217 27% 18%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 27% 16%;
+    --muted-foreground: 214 15% 66%;
+
+    --accent: 217 27% 18%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 350 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 216 28% 21%;
+    --input: 216 28% 21%;
+    --ring: 188 94% 43%;
+
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 220 44% 8%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 44% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 44% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 188 94% 43%;
+    --primary-foreground: 222 47% 11%;
+
+    --secondary: 217 27% 18%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 27% 16%;
+    --muted-foreground: 214 15% 66%;
+
+    --accent: 217 27% 18%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 350 70% 32%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 216 28% 21%;
+    --input: 216 28% 21%;
+    --ring: 188 94% 43%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family:
+      "Segoe UI",
+      "PingFang SC",
+      "Microsoft YaHei",
+      system-ui,
+      sans-serif;
+  }
+}

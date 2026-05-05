@@ -86,6 +86,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install frontend dependencies
+        shell: bash
+        run: |
+          cd web
+          pnpm install --frozen-lockfile
+
+      - name: Build frontend
+        shell: bash
+        run: |
+          cd web
+          pnpm run build
+
       - name: Install packages (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         shell: bash
@@ -172,6 +194,10 @@ jobs:
         run: |
           mkdir -p "$ARCHIVE"
           cp "$BIN" "$ARCHIVE"/
+          mkdir -p "$ARCHIVE/web"
+          cp -r web/out "$ARCHIVE/web/out"
+          cp README.md "$ARCHIVE"/
+          cp WEB_CONSOLE.md "$ARCHIVE"/
 
       - name: Build archive (Windows)
         shell: bash
