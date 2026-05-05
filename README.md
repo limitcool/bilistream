@@ -148,6 +148,10 @@ Web 控制台支持：
 - 查看最近运行日志
 - 展示当前版本号与 GitHub 仓库入口
 
+控制台截图：
+
+![bilistream Web Console](./docs/images/web-console.png)
+
 更多说明见 [WEB_CONSOLE.md](./WEB_CONSOLE.md)。
 
 ## 通知策略
