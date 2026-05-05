@@ -4,6 +4,8 @@
 
 当前版本：`v0.2.0`
 
+![bilistream Web Console](https://raw.githubusercontent.com/limitcool/bilistream/main/docs/images/web-console.png)
+
 ## 功能概览
 
 - 自动监控 `Twitch`、`YouTube`、`YouTubePreviewLive`
@@ -147,10 +149,6 @@ Web 控制台支持：
 - 在线编辑 `config.yaml`
 - 查看最近运行日志
 - 展示当前版本号与 GitHub 仓库入口
-
-控制台截图：
-
-![bilistream Web Console](./docs/images/web-console.png)
 
 更多说明见 [WEB_CONSOLE.md](./WEB_CONSOLE.md)。
 
