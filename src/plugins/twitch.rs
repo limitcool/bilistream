@@ -29,11 +29,12 @@ impl Live for Twitch {
                 "operationName":"StreamMetadata",
                 "variables":{
                     "channelLogin":&self.room,
+                    "includeIsDJ":true
                 },
                 "extensions":{
                     "persistedQuery":{
                         "version":1,
-                        "sha256Hash":"1c719a40e481453e5c48d9bb585d971b8b372f8ebb105b17076722264dfa5b3e"
+                        "sha256Hash":"b57f9b910f8cd1a4659d894fe7550ccc81ec9052c01e438b290fd66a040b9b93"
                     }
                 }
             }
